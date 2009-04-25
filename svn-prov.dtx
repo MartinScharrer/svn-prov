@@ -1,0 +1,217 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2009 by Martin Scharrer <martin@scharrer-online.de>
+% -----------------------------------------------------------------
+%
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.2
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.2 or later is part of all distributions of LaTeX
+% version 1999/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\RequirePackage{svn-prov}
+\ProvidesFileSVN{$Id: svn-prov.dtx 845 2009-04-21 12:03:08Z martin $}
+  [v0.\rev\space DTX for \filebase.sty]
+\documentclass{svn-prov}
+\usepackage{ifpdf}
+\ifpdf
+\usepackage{hyperref}
+\else
+\let\url=\texttt
+\fi
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+
+{%
+\tracingassigns=1
+\tracingonline=1
+\tracingcommands=1
+\tracingmacros=1
+\input{svn-prov.cfg}{}{}
+}
+\listfiles
+\begin{document}
+  \DocInput{svn-prov.dtx}
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2004/11/05}{Initial version}
+%
+% \GetFileInfo{svn-prov.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment}
+%
+%
+% \title{The \textsf{svn-prov} package\thanks{This document
+%   corresponds to \textsf{svn-prov}~\fileversion, dated \filedate.}}
+% \author{Martin Scharrer \\ \url{martin@scharrer-online.de}}
+%
+% \maketitle
+%
+% \section{Introduction}
+%
+% Put text here.
+%
+% \section{Usage}
+%
+% Put text here.
+%
+% \DescribeMacro{\dummyMacro}
+% This macro does nothing.\index{doing nothing|usage} It is merely an
+% example.  If this were a real macro, you would put a paragraph here
+% describing what the macro is supposed to do, what its mandatory and
+% optional arguments are, and so forth.
+%
+% \DescribeEnv{dummyEnv}
+% This environment does nothing.  It is merely an example.
+% If this were a real environment, you would put a paragraph here
+% describing what the environment is supposed to do, what its
+% mandatory and optional arguments are, and so forth.
+%
+% \StopEventually{}
+%
+% \section{Implementation}
+%    \begin{macrocode}
+\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+\ProvidesPackage{svn-prov}
+%    \end{macrocode}
+%
+%
+% \begin{macro}{\ProvidesClassSVN}
+%    \begin{macrocode}
+\def\ProvidesClassSVN{%
+  \def\svnprov@filename{\svnprov@filebase}%
+  \svnprov@generic\ProvidesClass
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ProvidesFileSVN}
+%    \begin{macrocode}
+\def\ProvidesFileSVN{%
+  \def\svnprov@filename{\svnprov@filebase.\svnprov@fileext}%
+  \svnprov@generic\ProvidesFile
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ProvidesPackageSVN}
+%    \begin{macrocode}
+\def\ProvidesPackageSVN{%
+  \def\svnprov@filename{\svnprov@filebase}%
+  \svnprov@generic\ProvidesPackage
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@generic}
+%    \begin{macrocode}
+\def\svnprov@generic#1#2{%
+  \def\svnprov@ltxprov{#1}%
+  \svnprov@scanid #2\relax $%
+    Id: unknown.xxx 0 0000-00-00 00:00:00Z user $\relax\relax
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@scanid}
+%    \begin{macrocode}
+\def\svnprov@scanid#1$Id: #2.#3 #4 #5-#6-#7 #8 $#9{%
+  \def\next{%
+    \PackageWarning{svn-prov}{Did not found valid SVN Id line.}{}{}{}%
+    \svnprov@gobbleopt
+  }%
+  \ifx\relax#1\relax
+    \ifx\relax#9\empty
+      \def\svnprov@filebase{#2}%
+      \def\svnprov@fileext{#3}%
+      \def\svnprov@filerev{#4}%
+      \def\svnprov@filedate{#5/#6/#7}%
+      \def\next{\svnprov@buildstring}%
+    \fi
+  \fi
+  \expandafter\next\svnprov@gobblerest
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@gobblerest}
+% Simply gobbles everything up to the next |\relax\relax|.
+%    \begin{macrocode}
+\def\svnprov@gobblerest#1\relax\relax{}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@gobbleopt}
+%    \begin{macrocode}
+\newcommand*\svnprov@gobbleopt[1][]{}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@defaultdesc}
+%    \begin{macrocode}
+\def\svnprov@defaultdesc{%
+  v\fileversion\space (SVN Rev: \svnprov@filerev)%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@buildstring}
+%    \begin{macrocode}
+\newcommand*\svnprov@buildstring[1][\svnprov@defaultdesc]{%
+  \begingroup
+    \let\rev\svnprov@filerev
+    \def\Rev{\rev\space}%
+    \let\revinfo\svnprov@defaultdesc
+    \let\filebase\svnprov@filebase
+    \let\fileext\svnprov@fileext
+    \let\filename\svnprov@filename
+    \ifx\fileversion\@undefined
+      \def\fileversion{0.0}%
+    \fi
+    \xdef\svnprov@descstr{\svnprov@filedate\space #1}%
+  \endgroup
+  \svnprov@ltxprov{\svnprov@filename}[\svnprov@descstr]%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\ProvidesPackageSVN{$Id: svn-prov.dtx 845 2009-04-21 12:03:08Z martin $}%
+%%  [v0.\Rev Package Date/Version from SVN Keywords]
+%    \end{macrocode}
+%
+% \Finale
+\endinput
+

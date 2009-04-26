@@ -90,12 +90,6 @@
 % describing what the macro is supposed to do, what its mandatory and
 % optional arguments are, and so forth.
 %
-% \DescribeEnv{dummyEnv}
-% This environment does nothing.  It is merely an example.
-% If this were a real environment, you would put a paragraph here
-% describing what the environment is supposed to do, what its
-% mandatory and optional arguments are, and so forth.
-%
 % \StopEventually{}
 %
 % \section{Implementation}
@@ -106,6 +100,8 @@
 %
 %
 % \begin{macro}{\ProvidesClassSVN}
+% Calls the generic macro with the original LaTeX macro and the string to be 
+% used as filename.
 %    \begin{macrocode}
 \def\ProvidesClassSVN{%
   \svnprov@generic\ProvidesClass{\svnprov@filebase}%
@@ -114,6 +110,8 @@
 % \end{macro}
 %
 % \begin{macro}{\ProvidesFileSVN}
+% Calls the generic macro with the original LaTeX macro and the string to be 
+% used as filename.
 %    \begin{macrocode}
 \def\ProvidesFileSVN{%
   \svnprov@generic\ProvidesFile{\svnprov@filebase.\svnprov@fileext}%
@@ -122,6 +120,8 @@
 % \end{macro}
 %
 % \begin{macro}{\ProvidesPackageSVN}
+% Calls the generic macro with the original LaTeX macro and the string to be 
+% used as filename.
 %    \begin{macrocode}
 \def\ProvidesPackageSVN{%
   \svnprov@generic\ProvidesPackage{\svnprov@filebase}%
@@ -130,6 +130,10 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@generic}
+% Awaits the original LaTeX macro as first argument, which is stored in
+% Stores the first argument (original macro) and tests if a explicit file name 
+% was given as optional argument. If not the second argument (default name) is 
+% used.
 %    \begin{macrocode}
 \def\svnprov@generic#1#2{%
   \def\svnprov@ltxprov{#1}%
@@ -141,7 +145,9 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@generic}
-%    \begin{macrocode}
+% Saves first argument as filename and calls the scan macro with the second.
+% A fall-back string is provided to avoid \TeX\ parsing errors.
+% \begin{macrocode}
 \def\svnprov@getid[#1]#2{%
   \def\svnprov@filename{#1}%
   \svnprov@scanid #2\relax $%
@@ -151,10 +157,15 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@scanid}
-%    \begin{macrocode}
+% Parses the Id string and tests if it is correct (\#1=empty, \#9=\cs{relax}).
+% If correct the values are stored in macros and the next macro is called.
+% Otherwise a warning message is printed. In both cases any remaining text of 
+% the parsing procedure is gobbled before the next step.
+% \begin{macrocode}
 \def\svnprov@scanid#1$Id: #2.#3 #4 #5-#6-#7 #8 $#9{%
   \def\next{%
-    \PackageWarning{svn-prov}{Did not found valid SVN Id line.}{}{}{}%
+    \PackageWarning{svn-prov}{Did not found valid SVN Id line in file 
+    '#2.#3'.}{}{}{}%
     \svnprov@gobbleopt
   }%
   \ifx\relax#1\relax
@@ -179,12 +190,15 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@gobbleopt}
+% Gobbles an optional argument if present.
 %    \begin{macrocode}
 \newcommand*\svnprov@gobbleopt[1][]{}
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\svnprov@defaultdesc}
+% Default description text to be used. Does not include the file date which is 
+% prepended later.
 %    \begin{macrocode}
 \def\svnprov@defaultdesc{%
   v\fileversion\space (SVN Rev: \svnprov@filerev)%
@@ -192,24 +206,10 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\GetFileInfoSVN}
-%    \begin{macrocode}
-\def\GetFileInfoSVN#1{%
-  \ifx*#1\relax
-    \let\filebase\svnprov@filebase
-    \let\fileext\svnprov@fileext
-    \let\filename\svnprov@filename
-    \let\filedate\svnprov@filedate
-    \let\filerev\svnprov@filerev
-  \else
-    \PackageError{svn-prov}{Macro \textbackslash GetFileInfoSVN without '*' is 
-    not implemented yet.}{}{}{}%
-  \fi
-}
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}{\svnprov@buildstring}
+% First aliases the internal macro to user-friendly names and then builds the 
+% info string. Finally the stored original LaTeX macro is called with the 
+% filename and information.
 %    \begin{macrocode}
 \newcommand*\svnprov@buildstring[1][\svnprov@defaultdesc]{%
   \begingroup
@@ -225,13 +225,42 @@
     \def\filename{\filebase.\fileext}%
     \xdef\svnprov@filename{\svnprov@filename}%
     \let\filename\svnprov@filename
-    \xdef\svnprov@descstr{\svnprov@filedate\space #1}%
+    \xdef\svnprov@fileinfo{#1}%
   \endgroup
-  \svnprov@ltxprov{\svnprov@filename}[\svnprov@descstr]%
+  \svnprov@ltxprov{\svnprov@filename}[\svnprov@filedate\space\svnprov@fileinfo]%
 }
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\GetFileInfoSVN}
+% At the moment this macro \textbf{must} be called with a star `|*|' which 
+% indicated that the current file is to be used. Other arguments are not 
+% implemented yet.
+% 
+% The macro provides the file information of ``the current file'', i.e.\ the 
+% last file which called one of the above \cs{Provides\ldots} macros. For this 
+% the internal macros are simply copied to user-friendly names.
+%
+% This macro is inspired by the macro \cs{GetFileInfo}\meta{file name} from the 
+% \texttt{doc} package.
+% \begin{macrocode}
+\def\GetFileInfoSVN#1{%
+  \ifx*#1\relax
+    \let\filebase\svnprov@filebase
+    \let\fileext\svnprov@fileext
+    \let\filename\svnprov@filename
+    \let\filedate\svnprov@filedate
+    \let\filerev\svnprov@filerev
+    \let\fileinfo\svnprov@fileinfo
+  \else
+    \PackageError{svn-prov}{Macro \textbackslash GetFileInfoSVN without '*' is 
+    not implemented yet.}{}{}{}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% Finally, call the macro for this package itself.
 %    \begin{macrocode}
 \ProvidesPackageSVN{$Id: svn-prov.dtx 845 2009-04-21 12:03:08Z martin $}%
   [v0.\Rev Package Date/Version from SVN Keywords]

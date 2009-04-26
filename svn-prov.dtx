@@ -18,8 +18,10 @@
 % \iffalse
 %<*driver>
 \RequirePackage{svn-prov}
+\def\fileversion{0.\filerev}
 \ProvidesFileSVN{$Id: svn-prov.dtx 845 2009-04-21 12:03:08Z martin $}
-  [v0.\rev\space DTX for \filebase.sty]
+  [v\fileversion\space DTX for \filebase.sty]
+\GetFileInfoSVN*
 \documentclass{svn-prov}
 \usepackage{ifpdf}
 \ifpdf
@@ -31,12 +33,6 @@
 \CodelineIndex
 \RecordChanges
 
-{%
-\tracingassigns=1
-\tracingonline=1
-\tracingcommands=1
-\tracingmacros=1
-}
 \input{svn-prov.cfg}{}{}
 \input{test.cfg}{}{}
 \listfiles
@@ -69,7 +65,7 @@
 %
 % \changes{v1.0}{2004/11/05}{Initial version}
 %
-% \GetFileInfo{svn-prov.dtx}
+% ^^A\GetFileInfo{svn-prov.dtx}
 %
 % \DoNotIndex{\newcommand,\newenvironment}
 %
@@ -196,11 +192,29 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\GetFileInfoSVN}
+%    \begin{macrocode}
+\def\GetFileInfoSVN#1{%
+  \ifx*#1\relax
+    \let\filebase\svnprov@filebase
+    \let\fileext\svnprov@fileext
+    \let\filename\svnprov@filename
+    \let\filedate\svnprov@filedate
+    \let\filerev\svnprov@filerev
+  \else
+    \PackageError{svn-prov}{Macro \textbackslash GetFileInfoSVN without '*' is 
+    not implemented yet.}{}{}{}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\svnprov@buildstring}
 %    \begin{macrocode}
 \newcommand*\svnprov@buildstring[1][\svnprov@defaultdesc]{%
   \begingroup
     \let\rev\svnprov@filerev
+    \let\filerev\svnprov@filerev
     \def\Rev{\rev\space}%
     \let\revinfo\svnprov@defaultdesc
     \let\filebase\svnprov@filebase

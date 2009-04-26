@@ -24,7 +24,6 @@
 \GetFileInfoSVN*
 \documentclass{svn-prov}
 \usepackage{hyperref}
-\usepackage{showexpl}
 
 \makeatletter
 %%% Examples %%%
@@ -310,7 +309,7 @@
   \def\svnprov@filemask{#2}%
   \@ifnextchar{[}%
     {\svnprov@getid}%
-    {\svnprov@getid[#2]}%
+    {\svnprov@getid[\svnprov@svnfilename]}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -342,8 +341,8 @@
   }%
   \ifx\relax#1\relax
     \ifx\relax#8\empty
-      \let\svnprov@filebase\@gobble%
-      \svnprov@splitfilename#2.\relax
+      \def\svnprov@svnfilename{#2}%
+      \svnprov@splitfilename{#2}%
       \def\svnprov@filerev{#3}%
       \def\svnprov@filedate{#4/#5/#6}%
       \def\next{\svnprov@buildstring}%
@@ -356,7 +355,18 @@
 %
 % \begin{macro}{\svnprov@splitfilename}
 %    \begin{macrocode}
-\def\svnprov@splitfilename#1.#2\relax{%
+\def\svnprov@splitfilename#1{%
+  \edef\g@tempa{#1}%
+  \let\svnprov@filebase\@gobble
+  \expandafter
+  \svnprov@splitfilename@\g@tempa.\relax
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@splitfilename@}
+%    \begin{macrocode}
+\def\svnprov@splitfilename@#1.#2\relax{%
   \if&#2&
     \ifx\svnprov@filebase\@gobble
       \gdef\svnprov@filebase{#1}%
@@ -367,7 +377,7 @@
     \let\next\relax
   \else
     \xdef\svnprov@filebase{\svnprov@filebase.#1}%
-    \def\next{\svnprov@splitfilename#2\relax}%
+    \def\next{\svnprov@splitfilename@#2\relax}%
   \fi
   \next
 }
@@ -422,12 +432,11 @@
     \ifx\fileversion\@undefined
       \def\fileversion{0.0}%
     \fi
-    \ifx\svnprov@filename\svnprov@filemask\else
-      \let\svnprov@filebase\@gobble
-      \expandafter\svnprov@splitfilename\svnprov@filename.\relax
-    \fi
-    \def\filename{\filebase.\fileext}%
+    \edef\filename{\filebase.\fileext}%
     \xdef\svnprov@filename{\svnprov@filename}%
+    \ifx\svnprov@filename\filename\else
+      \svnprov@splitfilename{\svnprov@filename}%
+    \fi
     \let\filename\svnprov@filename
     \xdef\svnprov@fileinfo{#1}%
   \endgroup

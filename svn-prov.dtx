@@ -23,12 +23,40 @@
   [v\fileversion\space DTX for \filebase.sty]
 \GetFileInfoSVN*
 \documentclass{svn-prov}
-\usepackage{ifpdf}
-\ifpdf
 \usepackage{hyperref}
-\else
-\let\url=\texttt
-\fi
+\usepackage{showexpl}
+
+\makeatletter
+%%% Examples %%%
+\RequirePackage{fancyvrb}
+\RequirePackage{listings}
+
+\newenvironment{example}
+  {\begingroup\VerbatimOut[gobble=4]{\jobname.exa}}
+  {\endVerbatimOut\endgroup\formatexample}
+
+\newsavebox{\examplecodebox}
+\newsavebox{\exampleresultbox}
+\usepackage{ifthen,calc}
+
+\def\formatexample{%
+  \par\noindent The statement:
+  \lstinputlisting{\jobname.exa}\medskip
+  is equivalent to:\\[\medskipamount]%
+  \input{\jobname.exa}%
+  \par\bigskip
+}
+
+\lstset{%
+  %numbers=left,
+  numberstyle=\scriptsize\sffamily,
+  basicstyle=\ttfamily,
+  stepnumber=1,
+  language=[latex]tex,
+}%
+
+\makeatother
+
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
@@ -103,7 +131,9 @@
 % different one, like a |.dtx| file, the correct file name can be provided by an 
 % optional argument. Because the file extension of package and class files is 
 % predefined and therefore ignored this is not needed for them when they are 
-% packed inside a corresponding |.dtx| file, i.e. one with the same base name. 
+% packed inside a corresponding |.dtx| file, i.e. one with the same base name.  
+% Please note that if used, the full file name must be given for files and only 
+% the base name for packages and classes.
 %
 % As with the standard macros mentioned above an optional argument can be given 
 % afterwards which contains additional information (date, version, description) 
@@ -127,11 +157,12 @@
 % \end{description}
 %
 % \par\medskip
-% \DescribeMacro{\GetFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}|*|\\%
-% The star version of this macro provides the file information of the last file 
-% which called one of the \cs{Provides\ldots SVN} macros. It is meant to be used 
-% inside a |.dtx| file directly after the provide macro so that the file 
-% information can be typeset inside the documentation.
+% \DescribeMacro{\GetFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}|*|
+% \\[-\baselineskip]\hspace*{\parindent}The star version of this macro provides 
+% the file information of the last file which called one of the 
+% \cs{Provides\ldots SVN} macros. It is meant to be used inside a |.dtx| file 
+% directly after the provide macro so that the file information can be typeset 
+% inside the documentation.
 %
 % A `normal', non-star version is not yet implemented.
 %
@@ -140,6 +171,62 @@
 % contains the file description, e.g.\ the content of the optional argument 
 % without date and version. The other macros were already described earlier.
 %
+% \section{Examples}
+% \begingroup
+% \def\{{\texttt{\char`\{}}%
+% \def\}{\texttt{\char`\}}}%
+% \def\ProvidesPackage#1[#2]{\texttt{\cs{ProvidesPackage}\{#1\}[#2]}}%
+% \def\ProvidesClass#1[#2]{\texttt{\cs{ProvidesClass}\{#1\}[#2]}}%
+% \def\ProvidesFile#1[#2]{\texttt{\cs{ProvidesFile}\{#1\}[#2]}}%
+%
+% The following examples illustrate the usage of the provided macros and their 
+% equivalent standard macros which are called by them internally after the SVN 
+% information are extracted and processed. While mostly the package macro is 
+% used here the usage is identical to the class and file macros, with the 
+% exception that the first argument.
+%
+% \subsubsection*{Minimal usage}
+% \begin{example}
+%   \ProvidesPackageSVN
+%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+% \end{example}
+%
+% \subsubsection*{Normal Usage}
+% \begin{example}
+%   \ProvidesPackageSVN
+%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     [v1.0 Example Description]
+% \end{example}
+%
+% \subsubsection*{Overwriting Name}
+% \begin{example}
+%   \ProvidesPackageSVN[othername]
+%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     [v1.0 Example Description]
+% \end{example}
+%
+% \subsubsection*{Overwriting Name using Macros}
+% \begin{example}
+%   \ProvidesFileSVN[\filebase.cfg]
+%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     [v1.0 Example Description]
+% \end{example}
+%
+% \subsubsection*{Using Macros in File Information String}
+% \begin{example}
+%   \ProvidesPackageSVN
+%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     [v1.\Rev Example Description]
+% \end{example}
+%
+% \subsubsection*{Adding Text to Default Information}
+% \begin{example}
+%   \ProvidesPackageSVN
+%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     [v1.\Rev Extra Text \revinfo]
+% \end{example}
+%
+% \endgroup
 % \StopEventually{}
 %
 % \section{Implementation}

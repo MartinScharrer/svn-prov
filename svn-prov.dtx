@@ -437,10 +437,10 @@
 %    \begin{macrocode}
 \def\svnprov@getversion#1 #2\relax#3\svnprov@endmarker{%
   \if&#3&%
+    \def\fileversion{??}%
+  \else
     \def\fileversion{#1}%
     \def\fileinfo{#2}%
-  \else
-    \def\fileversion{??}%
   \fi
 }
 %    \end{macrocode}

@@ -38,7 +38,7 @@
 \newsavebox{\exampleresultbox}
 \usepackage{ifthen,calc}
 
-\def\examplebeforetext{The statement:}
+\def\examplebeforetext{The following code:}
 \def\exampleaftertext{is equivalent to:}
 
 \def\formatexample{%
@@ -194,10 +194,28 @@
 %   \ProvidesPackageSVN
 %     {$Id$}
 % \end{example}
+% \begin{example}
+%   \ProvidesClassSVN
+%     {$Id$}
+% \end{example}
+% \begin{example}
+%   \ProvidesFileSVN
+%     {$Id$}
+% \end{example}
 %
 % \subsubsection*{Normal Usage}
 % \begin{example}
 %   \ProvidesPackageSVN
+%     {$Id$}
+%     [v1.0 Example Description]
+% \end{example}
+% \begin{example}
+%   \ProvidesClassSVN
+%     {$Id$}
+%     [v1.0 Example Description]
+% \end{example}
+% \begin{example}
+%   \ProvidesFileSVN
 %     {$Id$}
 %     [v1.0 Example Description]
 % \end{example}
@@ -238,8 +256,7 @@
 % \end{example}
 %
 % \subsection*{Getting the File Information}
-% \def\examplebeforetext{The code:}
-% \def\exampleaftertext{results in:}
+\def\exampleaftertext{results in:}
 % \def\ProvidesPackage#1[#2]{}%
 %
 % \begin{example}
@@ -258,6 +275,9 @@
 %     File Info      & \fileinfo    \\
 %   \end{tabular}
 % \end{example}
+% \noindent
+% The correct package file extension `|.sty|' for \cs{fileext} can be forced by 
+% using |[\filebase.sty]| as a first optional argument.
 %
 % \endgroup
 % \StopEventually{}

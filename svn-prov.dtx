@@ -39,11 +39,15 @@
 \newsavebox{\exampleresultbox}
 \usepackage{ifthen,calc}
 
+\def\examplebeforetext{The statement:}
+\def\exampleaftertext{is equivalent to:}
+
 \def\formatexample{%
-  \par\noindent The statement:
+  \par\noindent\examplebeforetext
   \lstinputlisting{\jobname.exa}\medskip
-  is equivalent to:\\[\medskipamount]%
-  \input{\jobname.exa}%
+  \exampleaftertext\\[\medskipamount]%
+  {\catcode`\%=14%
+  \input{\jobname.exa}}%
   \par\bigskip
 }
 
@@ -225,6 +229,28 @@
 %   \ProvidesPackageSVN
 %     {$Id$}
 %     [v1.\Rev Extra Text \revinfo]
+% \end{example}
+%
+% \subsection*{Getting the File Information}
+% \def\examplebeforetext{The code:}
+% \def\exampleaftertext{results in:}
+% \def\ProvidesPackage#1[#2]{}%
+%
+% \begin{example}
+%   \ProvidesPackageSVN
+%     {$Id$}
+%     [v1.\Rev Extra Text \revinfo]
+%   \GetFileInfoSVN*
+%   % ...
+%   \begin{tabular}{l@{\ :\ \ }l}
+%     File Name      & \filename    \\
+%     File Base Name & \filebase    \\
+%     File Extension & \fileext     \\
+%     File Date      & \filedate    \\
+%     File Revision  & \filerev     \\
+%     File Version   & \fileversion \\
+%     File Info      & \fileinfo    \\
+%   \end{tabular}
 % \end{example}
 %
 % \endgroup

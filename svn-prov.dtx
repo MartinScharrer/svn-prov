@@ -300,7 +300,8 @@
 % Otherwise a warning message is printed. In both cases any remaining text of 
 % the parsing procedure is gobbled before the next step.
 % \begin{macrocode}
-\def\svnprov@scanid#1$Id$#9{%
+\def\svnprov@scanid#1$%
+  Id: #2.#3 #4 #5-#6-#7 #8 $#9{%
   \def\next{%
     \PackageWarning{svn-prov}{Did not found valid SVN Id line in file 
     '#2.#3'.}{}{}{}%
@@ -316,7 +317,7 @@
     \fi
   \fi
   \expandafter\next\svnprov@gobblerest
-}
+}% $
 %    \end{macrocode}
 % \end{macro}
 %

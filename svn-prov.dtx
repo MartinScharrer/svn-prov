@@ -78,17 +78,67 @@
 %
 % \section{Introduction}
 %
-% Put text here.
-%
 % \section{Usage}
+% Package and class authors can use the following macros which replace the 
+% standard \LaTeX\ macros \cs{ProvidesPackage}, \cs{ProvidesClass} and 
+% \cs{ProvidesFile}, respectively.
 %
-% Put text here.
+% \par\medskip
+% \DescribeMacro{\ProvidesPackageSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg
+% {file name}|{$|Id: \ldots\ |$}|\oarg
+% {Package Information (version, description)}\\
 %
-% \DescribeMacro{\dummyMacro}
-% This macro does nothing.\index{doing nothing|usage} It is merely an
-% example.  If this were a real macro, you would put a paragraph here
-% describing what the macro is supposed to do, what its mandatory and
-% optional arguments are, and so forth.
+% \par
+% \DescribeMacro{\ProvidesClassSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg
+% {file name}|{$|Id: \ldots\ |$}|\oarg
+% {Class Information (version, description)}\\
+%
+% \par
+% \DescribeMacro{\ProvidesFileSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg
+% {file name}|{$|Id: \ldots\ |$}|\oarg
+% {File Information (version, description)}\\[\smallskipamount]
+% All of these macros await a valid Subversion Id keyword string as a mandatory 
+% argument. The file name and date is extracted from this string. For cases when 
+% the file source is not stored in the correct file but packed inside a 
+% different one, like a |.dtx| file, the correct file name can be provided by an 
+% optional argument. Because the file extension of package and class files is 
+% predefined and therefore ignored this is not needed for them when they are 
+% packed inside a corresponding |.dtx| file, i.e. one with the same base name. 
+%
+% As with the standard macros mentioned above an optional argument can be given 
+% afterwards which contains additional information (date, version, description) 
+% of the package, class or file.  The SVN macros automatically insert the date, 
+% so only a version number and a short description should be given.
+%
+% Both optional arguments can include the following macros which are only valid 
+% inside them, but not afterwards:
+% \begin{description}
+%   \item[\cs{rev}] File revision.
+%   \item[\cs{Rev}] File revision followed by a space.
+%   \item[\cs{revinfo}] The default information used: ``\texttt{v\meta{version} 
+%   (SVN Rev: \meta{revision})}''. The version is taken from a previous defined 
+%   \cs{fileversion} which is locally set to ``0.0'' if it should not be 
+%   defined.
+%   \item[\cs{filebase}] File base name (file name without extension).
+%   \item[\cs{fileext}] File extension (without leading dot).
+%   \item[\cs{filename}] File name.
+%   \item[\cs{filedate}] File date (in the format YYYY/MM/DD).
+%   \item[\cs{filerev}] File revision, like \cs{rev}.
+% \end{description}
+%
+% \par\medskip
+% \DescribeMacro{\GetFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}|*|\\%
+% The star version of this macro provides the file information of the last file 
+% which called one of the \cs{Provides\ldots SVN} macros. It is meant to be used 
+% inside a |.dtx| file directly after the provide macro so that the file 
+% information can be typeset inside the documentation.
+%
+% A `normal', non-star version is not yet implemented.
+%
+% The provided information macros are \cs{filebase}, \cs{fileext}, 
+% \cs{filename}, \cs{filedate}, \cs{filerev} and \cs{fileinfo}. The last one 
+% contains the file description, e.g.\ the content of the optional argument 
+% without date and version. The other macros were already described earlier.
 %
 % \StopEventually{}
 %
@@ -97,7 +147,6 @@
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
 \ProvidesPackage{svn-prov}
 %    \end{macrocode}
-%
 %
 % \begin{macro}{\ProvidesClassSVN}
 % Calls the generic macro with the original LaTeX macro and the string to be 
@@ -241,7 +290,7 @@
 % last file which called one of the above \cs{Provides\ldots} macros. For this 
 % the internal macros are simply copied to user-friendly names.
 %
-% This macro is inspired by the macro \cs{GetFileInfo}\meta{file name} from the 
+% This macro is inspired by the macro \cs{GetFileInfo}\marg{file name} from the 
 % \texttt{doc} package.
 % \begin{macrocode}
 \def\GetFileInfoSVN#1{%

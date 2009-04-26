@@ -210,6 +210,13 @@
 %     [v1.0 Example Description]
 % \end{example}
 %
+% \subsubsection*{Overwriting Name including unneeded Extension}
+% \begin{example}
+%   \ProvidesPackageSVN[othername.sty]
+%     {$Id$}
+%     [v1.0 Example Description]
+% \end{example}
+%
 % \subsubsection*{Overwriting Name using Macros}
 % \begin{example}
 %   \ProvidesFileSVN[\filebase.cfg]
@@ -300,6 +307,7 @@
 %    \begin{macrocode}
 \def\svnprov@generic#1#2{%
   \def\svnprov@ltxprov{#1}%
+  \def\svnprov@filemask{#2}%
   \@ifnextchar{[}%
     {\svnprov@getid}%
     {\svnprov@getid[#2]}%
@@ -326,18 +334,18 @@
 % the parsing procedure is gobbled before the next step.
 % \begin{macrocode}
 \def\svnprov@scanid#1$%
-  Id: #2.#3 #4 #5-#6-#7 #8 $#9{%
+  Id: #2 #3 #4-#5-#6 #7 $#8{%
   \def\next{%
     \PackageWarning{svn-prov}{Did not found valid SVN Id line in file 
-    '#2.#3'.}{}{}{}%
+    '#2'.}{}{}{}%
     \svnprov@gobbleopt
   }%
   \ifx\relax#1\relax
-    \ifx\relax#9\empty
-      \def\svnprov@filebase{#2}%
-      \def\svnprov@fileext{#3}%
-      \def\svnprov@filerev{#4}%
-      \def\svnprov@filedate{#5/#6/#7}%
+    \ifx\relax#8\empty
+      \let\svnprov@filebase\@gobble%
+      \svnprov@splitfilename#2.\relax
+      \def\svnprov@filerev{#3}%
+      \def\svnprov@filedate{#4/#5/#6}%
       \def\next{\svnprov@buildstring}%
     \fi
   \fi
@@ -351,14 +359,14 @@
 \def\svnprov@splitfilename#1.#2\relax{%
   \if&#2&
     \ifx\svnprov@filebase\@gobble
-      \def\svnprov@filebase{#1}%
-      \def\svnprov@fileext{}%
+      \gdef\svnprov@filebase{#1}%
+      \gdef\svnprov@fileext{}%
     \else
-      \def\svnprov@fileext{#1}%
+      \gdef\svnprov@fileext{#1}%
     \fi
     \let\next\relax
   \else
-    \edef\svnprov@filebase{\svnprov@filebase.#1}%
+    \xdef\svnprov@filebase{\svnprov@filebase.#1}%
     \def\next{\svnprov@splitfilename#2\relax}%
   \fi
   \next
@@ -414,12 +422,16 @@
     \ifx\fileversion\@undefined
       \def\fileversion{0.0}%
     \fi
+    \ifx\svnprov@filename\svnprov@filemask\else
+      \let\svnprov@filebase\@gobble
+      \expandafter\svnprov@splitfilename\svnprov@filename.\relax
+    \fi
     \def\filename{\filebase.\fileext}%
     \xdef\svnprov@filename{\svnprov@filename}%
     \let\filename\svnprov@filename
     \xdef\svnprov@fileinfo{#1}%
   \endgroup
-  \svnprov@ltxprov{\svnprov@filename}[\svnprov@filedate\space\svnprov@fileinfo]%
+  \svnprov@ltxprov{\svnprov@filemask}[\svnprov@filedate\space\svnprov@fileinfo]%
 }
 %    \end{macrocode}
 % \end{macro}

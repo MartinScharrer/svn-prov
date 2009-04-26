@@ -336,10 +336,9 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@generic}
-% Awaits the original LaTeX macro as first argument, which is stored in
-% Stores the first argument (original macro) and tests if a explicit file name 
-% was given as optional argument. If not the second argument (default name) is 
-% used.
+% Stores the arguments (1: original macro, 2: file mask (full filename of only 
+% base is used?)). Then tests if a explicit file name was given as optional 
+% argument.  If not the file name from the SVN Id string is used.
 %    \begin{macrocode}
 \def\svnprov@generic#1#2{%
   \def\svnprov@ltxprov{#1}%
@@ -354,7 +353,7 @@
 % \begin{macro}{\svnprov@generic}
 % Saves first argument as filename and calls the scan macro with the second.
 % A fall-back string is provided to avoid \TeX\ parsing errors.
-% \begin{macrocode}
+%    \begin{macrocode}
 \def\svnprov@getid[#1]#2{%
   \def\svnprov@filename{#1}%
   \svnprov@scanid #2\relax $%
@@ -364,7 +363,7 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@scanid}
-% Parses the Id string and tests if it is correct (\#1=empty, \#9=\cs{relax}).
+% Parses the Id string and tests if it is correct (\#1=empty, \#8=\cs{relax}).
 % If correct the values are stored in macros and the next macro is called.
 % Otherwise a warning message is printed. In both cases any remaining text of 
 % the parsing procedure is gobbled before the next step.
@@ -391,6 +390,9 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@splitfilename}
+% Expands the argument and initialises the file base macro before it calls the 
+% next macro with the expanded argument and a dot to protect for \TeX\ parsing 
+% errors. The \cs{relax} is used as end marker.
 %    \begin{macrocode}
 \def\svnprov@splitfilename#1{%
   \edef\g@tempa{#1}%
@@ -402,7 +404,17 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@splitfilename@}
-%    \begin{macrocode}
+% The second argument is tested if it is empty (end of file name reached). If 
+% not empty the first argument is concatenated to the file base macro and the 
+% macro calls itself on the second argument. This ensures correct handling of 
+% file name which contain multiple dots.
+% 
+% If the second argument was empty it is tested if the file base name is still 
+% in its initialised state which means that there is no file extension. Then the 
+% file base is defined to the first argument and the extension as empty.
+% Otherwise the file extension is defined to the first argument and the file 
+% base macro is unchanged because it is already correct.
+% \begin{macrocode}
 \def\svnprov@splitfilename@#1.#2\relax{%
   \if&#2&
     \ifx\svnprov@filebase\@gobble
@@ -511,7 +523,10 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%
 % \begin{macro}{\svnprov@getversion}
+% Splits the string at the first space into arguments \#1 (version) and \#2 
+% (info).  Argument \#3 will be empty if there was no space in the string.
 %    \begin{macrocode}
 \def\svnprov@getversion#1 #2\relax#3\svnprov@endmarker{%
   \if&#3&%

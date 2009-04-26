@@ -178,15 +178,23 @@
 % \begingroup
 % \def\{{\texttt{\char`\{}}%
 % \def\}{\texttt{\char`\}}}%
-% \def\ProvidesPackage#1[#2]{\texttt{\cs{ProvidesPackage}\{#1\}[#2]}}%
-% \def\ProvidesClass#1[#2]{\texttt{\cs{ProvidesClass}\{#1\}[#2]}}%
-% \def\ProvidesFile#1[#2]{\texttt{\cs{ProvidesFile}\{#1\}[#2]}}%
+% \def\ProvidesPackage#1[#2]{\texttt{\cs{ProvidesPackage}\{#1\}[#2]}\\}%
+% \def\ProvidesClass#1[#2]{\texttt{\cs{ProvidesClass}\{#1\}[#2]}\\}%
+% \def\ProvidesFile#1[#2]{\texttt{\cs{ProvidesFile}\{#1\}[#2]}\\}%
 %
-% The following examples illustrate the usage of the provided macros and their 
-% equivalent standard macros which are called by them internally after the SVN 
-% information are extracted and processed. While mostly the package macro is 
-% used here the usage is identical to the class and file macros, with the 
-% exception of the first optional argument which is explained above.
+% The following examples illustrate the usage of the provided macros and how 
+% they call the equivalent standard macros internally. The example 
+% \emph{results} are produced by expanding the corresponding example \emph{code} 
+% while the standard provide macros are locally redefined to typeset their own 
+% name and arguments in verbatim style. This does not only simplifies the 
+% generation of this document but makes this examples also test cases which 
+% allow the package author to test the result of the defined macros.
+%
+% While mostly the package macro is used here the usage is identical to the 
+% class and file macros. Of course before this macros are used it must be made 
+% sure that the \texttt{svn-prov} package is loaded which is done by using the 
+% following code direct before them:\\[\smallskipamount]
+% |\RequirePackage{svn-prov}|\\
 %
 % \frenchspacing
 % \subsubsection*{Minimal usage}

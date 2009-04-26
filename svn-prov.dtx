@@ -19,7 +19,7 @@
 %<*driver>
 \RequirePackage{svn-prov}
 \def\fileversion{0.\filerev}
-\ProvidesFileSVN{$Id: svn-prov.dtx 845 2009-04-21 12:03:08Z martin $}
+\ProvidesFileSVN{$Id$}
   [v\fileversion\space DTX for \filebase.sty]
 \GetFileInfoSVN*
 \documentclass{svn-prov}
@@ -138,7 +138,9 @@
 % As with the standard macros mentioned above an optional argument can be given 
 % afterwards which contains additional information (date, version, description) 
 % of the package, class or file.  The SVN macros automatically insert the date, 
-% so only a version number and a short description should be given.
+% so only a version number and a short description should be given. If this 
+% argument is not given a default information string is used which is shown 
+% below as \cs{revinfo}.
 %
 % Both optional arguments can include the following macros which are only valid 
 % inside them, but not afterwards:
@@ -183,46 +185,46 @@
 % equivalent standard macros which are called by them internally after the SVN 
 % information are extracted and processed. While mostly the package macro is 
 % used here the usage is identical to the class and file macros, with the 
-% exception that the first argument.
+% exception of the first optional argument which is explained above.
 %
 % \subsubsection*{Minimal usage}
 % \begin{example}
 %   \ProvidesPackageSVN
-%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     {$Id$}
 % \end{example}
 %
 % \subsubsection*{Normal Usage}
 % \begin{example}
 %   \ProvidesPackageSVN
-%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     {$Id$}
 %     [v1.0 Example Description]
 % \end{example}
 %
 % \subsubsection*{Overwriting Name}
 % \begin{example}
 %   \ProvidesPackageSVN[othername]
-%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     {$Id$}
 %     [v1.0 Example Description]
 % \end{example}
 %
 % \subsubsection*{Overwriting Name using Macros}
 % \begin{example}
 %   \ProvidesFileSVN[\filebase.cfg]
-%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     {$Id$}
 %     [v1.0 Example Description]
 % \end{example}
 %
 % \subsubsection*{Using Macros in File Information String}
 % \begin{example}
 %   \ProvidesPackageSVN
-%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     {$Id$}
 %     [v1.\Rev Example Description]
 % \end{example}
 %
 % \subsubsection*{Adding Text to Default Information}
 % \begin{example}
 %   \ProvidesPackageSVN
-%     {$Id: file.sty 123 2009-02-02 00:00:00 martin $}
+%     {$Id$}
 %     [v1.\Rev Extra Text \revinfo]
 % \end{example}
 %
@@ -298,7 +300,7 @@
 % Otherwise a warning message is printed. In both cases any remaining text of 
 % the parsing procedure is gobbled before the next step.
 % \begin{macrocode}
-\def\svnprov@scanid#1$Id: #2.#3 #4 #5-#6-#7 #8 $#9{%
+\def\svnprov@scanid#1$Id$#9{%
   \def\next{%
     \PackageWarning{svn-prov}{Did not found valid SVN Id line in file 
     '#2.#3'.}{}{}{}%
@@ -398,7 +400,7 @@
 %
 % Finally, call the macro for this package itself.
 %    \begin{macrocode}
-\ProvidesPackageSVN{$Id: svn-prov.dtx 845 2009-04-21 12:03:08Z martin $}%
+\ProvidesPackageSVN{$Id$}%
   [v0.\Rev Package Date/Version from SVN Keywords]
 %    \end{macrocode}
 %

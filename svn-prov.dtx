@@ -346,6 +346,26 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\svnprov@splitfilename}
+%    \begin{macrocode}
+\def\svnprov@splitfilename#1.#2\relax{%
+  \if&#2&
+    \ifx\svnprov@filebase\@gobble
+      \def\svnprov@filebase{#1}%
+      \def\svnprov@fileext{}%
+    \else
+      \def\svnprov@fileext{#1}%
+    \fi
+    \let\next\relax
+  \else
+    \edef\svnprov@filebase{\svnprov@filebase.#1}%
+    \def\next{\svnprov@splitfilename#2\relax}%
+  \fi
+  \next
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\svnprov@gobblerest}
 % Simply gobbles everything up to the next endmarker.
 %    \begin{macrocode}

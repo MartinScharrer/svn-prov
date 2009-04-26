@@ -1,0 +1,13 @@
+Package svn-prov
+~~~~~~~~~~~~~~~~
+This package introduces Subversion variants of the standard LaTeX macros
+\ProvidesPackage, \ProvidesClass and \ProvidesFile where the file name and date 
+is extracted from Subversion Id keywords. The file name can also be given 
+explicitly as an optional argument.
+
+Syntax summary:
+
+\ProvidesPackageSVN [file name]{$Id: ... $}[Package Information (version, description)]
+\ProvidesClassSVN [file name]{$Id: ... $}[Class Information (version, description)]
+\ProvidesFileSVN [file name]{$Id: ... $}[File Information (version, description)]
+

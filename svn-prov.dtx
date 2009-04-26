@@ -147,10 +147,8 @@
 % \begin{description}
 %   \item[\cs{rev}] File revision.
 %   \item[\cs{Rev}] File revision followed by a space.
-%   \item[\cs{revinfo}] The default information used: ``\texttt{v\meta{version} 
-%   (SVN Rev: \meta{revision})}''. The version is taken from a previous defined 
-%   \cs{fileversion} which is locally set to ``0.0'' if it should not be 
-%   defined.
+%   \item[\cs{revinfo}] The default information used: ``\texttt{(SVN Rev: 
+%   \meta{revision})}''.
 %   \item[\cs{filebase}] File base name (file name without extension).
 %   \item[\cs{fileext}] File extension (without leading dot).
 %   \item[\cs{filename}] File name.
@@ -187,6 +185,7 @@
 % used here the usage is identical to the class and file macros, with the 
 % exception of the first optional argument which is explained above.
 %
+% \frenchspacing
 % \subsubsection*{Minimal usage}
 % \begin{example}
 %   \ProvidesPackageSVN
@@ -340,7 +339,7 @@
 % prepended later.
 %    \begin{macrocode}
 \def\svnprov@defaultdesc{%
-  v\fileversion\space (SVN Rev: \svnprov@filerev)%
+  (SVN Rev:\space\svnprov@filerev)%
 }
 %    \end{macrocode}
 % \end{macro}

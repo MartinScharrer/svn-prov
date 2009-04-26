@@ -18,10 +18,19 @@
 % \iffalse
 %<*driver>
 \RequirePackage{svn-prov}
-\def\fileversion{0.\filerev}
+\makeatletter
+%</driver>
+%<*driver|package>
+\let\svnprov@orig@fileversion\fileversion
+\def\fileversion{v0.\rev}
+%</driver|package>
+%<*driver>
+\makeatother
 \ProvidesFileSVN{$Id$}
-  [v\fileversion\space DTX for \filebase.sty]
+  [\fileversion\space DTX for \filebase.sty]
 \GetFileInfoSVN*
+\let\svnprovversion\fileversion
+\let\svnprovdate\filedate
 \documentclass{svn-prov}
 \usepackage{hyperref}
 
@@ -96,14 +105,17 @@
 %
 % \changes{v1.0}{2004/11/05}{Initial version}
 %
-% ^^A\GetFileInfo{svn-prov.dtx}
+% ^^A \GetFileInfo{\jobname.dtx}
 %
-% \DoNotIndex{\newcommand,\newenvironment}
+% \DoNotIndex{\newcommand,\newenvironment,\def,\edef,\gdef,\xdef,\let,\@tempa}
+% \DoNotIndex{\g@tempa,\textbackslash,\ifx,\if,\ifnum,\else,\fi,\relax,\space}
+% \DoNotIndex{\@ifnextchar,\@gobble,\@undefined,\begingroup,\endgroup,\empty}
+% \DoNotIndex{\expandafter,\NeedsTeXFormat}
 %
-%
-% \title{The \textsf{svn-prov} package\thanks{This document
-%   corresponds to \textsf{svn-prov}~\fileversion, dated \filedate.}}
+% \title{The \textsf{svn-prov} package\\\large Use SVN Id keyword for package, 
+% class and file header}
 % \author{Martin Scharrer \\ \url{martin@scharrer-online.de}}
+% \date{Version~\svnprovversion\ - \svnprovdate}
 %
 % \maketitle
 %
@@ -262,7 +274,7 @@
 % \end{example}
 %
 % \subsection*{Getting the File Information}
-\def\exampleaftertext{results in:}
+% \def\exampleaftertext{results in:}
 % \def\ProvidesPackage#1[#2]{}%
 %
 % \begin{example}
@@ -291,7 +303,6 @@
 % \section{Implementation}
 %    \begin{macrocode}
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
-\ProvidesPackage{svn-prov}
 %    \end{macrocode}
 %
 % \begin{macro}{\ProvidesClassSVN}
@@ -456,7 +467,7 @@
     \let\filebase\svnprov@filebase
     \let\fileext\svnprov@fileext
     \ifx\fileversion\@undefined
-      \def\fileversion{0.0}%
+      \def\fileversion{v0.0}%
     \fi
     \edef\filename{\filebase.\fileext}%
     \xdef\svnprov@filename{\svnprov@filename}%
@@ -516,7 +527,13 @@
 % Finally, call the macro for this package itself.
 %    \begin{macrocode}
 \ProvidesPackageSVN{$Id$}%
-  [v0.\Rev Package Date/Version from SVN Keywords]
+  [\fileversion\space Package Date/Version from SVN Keywords]
+%    \end{macrocode}
+% The macro \cs{fileversion} is restored to it original value which it had 
+% before this package was loaded.
+%    \begin{macrocode}
+\let\fileversion\svnprov@orig@fileversion
+\let\svnprov@orig@fileversion\@undefined
 %    \end{macrocode}
 %
 % \Finale

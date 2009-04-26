@@ -288,7 +288,7 @@
 \def\svnprov@getid[#1]#2{%
   \def\svnprov@filename{#1}%
   \svnprov@scanid #2\relax $%
-    Id: unknown.xxx 0 0000-00-00 00:00:00Z user $\relax\relax
+    Id: unknown.xxx 0 0000-00-00 00:00:00Z user $\svnprov@endmarker
 }
 %    \end{macrocode}
 % \end{macro}
@@ -321,9 +321,17 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@gobblerest}
-% Simply gobbles everything up to the next |\relax\relax|.
+% Simply gobbles everything up to the next endmarker.
 %    \begin{macrocode}
-\def\svnprov@gobblerest#1\relax\relax{}
+\def\svnprov@gobblerest#1\svnprov@endmarker{}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@endmarker}
+% This is the end marker which should never be expanded. However it gets defined 
+% and set to an unique definition which will gobble itself if ever expanded.
+%    \begin{macrocode} 
+\def\svnprov@endmarker{\@gobble{svn-prov endmarker}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -390,9 +398,23 @@
     \let\filedate\svnprov@filedate
     \let\filerev\svnprov@filerev
     \let\fileinfo\svnprov@fileinfo
+    \expandafter\svnprov@getversion
+    \svnprov@fileinfo\relax{} \relax\svnprov@endmarker
   \else
     \PackageError{svn-prov}{Macro \textbackslash GetFileInfoSVN without '*' is 
     not implemented yet.}{}{}{}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\svnprov@getversion}
+%    \begin{macrocode}
+\def\svnprov@getversion#1 #2\relax#3\svnprov@endmarker{%
+  \if&#3&%
+    \def\fileversion{#1}%
+    \def\fileinfo{#2}%
+  \else
+    \def\fileversion{??}%
   \fi
 }
 %    \end{macrocode}

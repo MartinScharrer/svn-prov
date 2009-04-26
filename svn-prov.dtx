@@ -32,7 +32,7 @@
 \let\svnprovversion\fileversion
 \let\svnprovdate\filedate
 \documentclass{svn-prov}
-\usepackage{hyperref}
+\usepackage[hyperfootnotes=false]{hyperref}
 
 \makeatletter
 %%% Examples %%%
@@ -67,24 +67,38 @@
   language=[latex]tex,
 }%
 
+
+\usepackage{xspace}
+\newcommand*{\pkg}[1]{%
+  \href{http://tug.ctan.org/pkg/#1}{\texttt{#1}}%
+  % URL footnote (for print-out) on first appearance:
+  \@ifundefined{seen@package@#1}{%
+    \footnote{CTAN: \url{http://tug.ctan.org/pkg/#1}}%
+    \@namedef{seen@package@#1}{1}%
+  }{}%
+  \xspace
+}
+
+\def\darg#1{\texttt{\frenchspacing\char`\{\$#1\$\char`\}}}
+
 \makeatother
 
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
 
-\input{svn-prov.cfg}{}{}
-\input{test.cfg}{}{}
+\let\manualnewpage\newpage
 \listfiles
 \begin{document}
   \DocInput{svn-prov.dtx}
   \PrintChanges
+  \manualnewpage
   \PrintIndex
 \end{document}
 %</driver>
 % \fi
 %
-% \CheckSum{0}
+% \CheckSum{220}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -112,7 +126,7 @@
 % \DoNotIndex{\@ifnextchar,\@gobble,\@undefined,\begingroup,\endgroup,\empty}
 % \DoNotIndex{\expandafter,\NeedsTeXFormat}
 %
-% \title{The \textsf{svn-prov} package\\\large Use SVN Id keyword for package, 
+% \title{The \textsf{svn-prov} package\\\large Use SVN Id keywords for package, 
 % class and file header}
 % \author{Martin Scharrer \\ \url{martin@scharrer-online.de}}
 % \date{Version~\svnprovversion\ - \svnprovdate}
@@ -120,26 +134,63 @@
 % \maketitle
 %
 % \section{Introduction}
+% This package is directed to authors of \LaTeX\ packages and classes which use 
+% the version control software 
+% \href{http://subversion.tigris.org/}{Subversion}\footnote
+% {WWW: \url{http://subversion.tigris.org/}} (SVN) for their source files. It 
+% introduces three macros which are Subversion variants of the standard \LaTeX\ 
+% header macros \cs{ProvidesPackage}, \cs{ProvidesClass} and \cs{ProvidesFile} 
+% which are used to identify package, class and other files, respectively.  
+% Instead of providing the package/class/file name and date manually they are 
+% extracted from a Subversion Id keywords string which
+% is updated automatically by every time the source file is committed to the 
+% repository.
+% 
+% A similar package exists for RCS, the pre-predecessor of Subversion, in the 
+% \pkg{pgf} bundle which is called \texttt{pgfrcs}.
+% For further support for Subversion keywords see the author's other package 
+% \pkg{svn-multi}.
 %
 % \section{Usage}
-% Package and class authors can use the following macros which replace the 
-% standard \LaTeX\ macros \cs{ProvidesPackage}, \cs{ProvidesClass} and 
-% \cs{ProvidesFile}, respectively.
+% ^^A\subsection{Subversion Id Keyword}
+% The following macros need an Id keyword which can initially be written as 
+% `|$||Id:$|' and will be expanded by Subversion into the following format at 
+% the next commit:\\[\smallskipamount]
+% \texttt{\frenchspacing\${}Id: \meta{filename} \meta{revision} \meta{date} 
+% \meta{time} \meta{author} \$}\\[\smallskipamount]
+% e.g. for the source file of this document:\\*[\smallskipamount]
+% |$Id$|
+% \par\smallskip
+% For this to work the Subversion \emph{property} \texttt{svn:keywords} must be 
+% set to (at least) `|Id|' for the source file(s). e.g.\ using the command 
+% line:\\[\smallskipamount]
+% \texttt{svn propset 'svn:keyword' 'Id' \meta{filename(s)}}
+% \par\smallskip
+% \nopagebreak[3]
+% More information about using Subversion in the \LaTeX\ workflow can be found in the 
+% Prac\TeX{} Journal issue 2007-3\footnote
+% {URL: 
+% \ttfamily\url{http://www.tug.org/pracjourn/2007-3/}\char`\{\href
+% {http://www.tug.org/pracjourn/2007-3/skiadas-svn}{skiadas-svn}\char`\|\href
+% {http://www.tug.org/pracjourn/2007-3/ziegenhagen}{ziegenhagen}\char`\|\href
+% {http://www.tug.org/pracjourn/2007-3/scharrer}{scharrer}\char`\}}.
 %
-% \par\medskip
-% \DescribeMacro{\ProvidesPackageSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg
-% {file name}|{$|Id: \ldots\ |$}|\oarg
-% {Package Information (version, description)}\\
+% ^^A\subsection{Main Macros}
+% \manualnewpage%%
+% \DescribeMacro{\ProvidesPackageSVN}
+% \DescribeMacro{\ProvidesClassSVN}
+% \DescribeMacro{\ProvidesFileSVN}
+% \hspace*{-\parindent}\hspace{-\marginparsep}
+% {\oarg
+% {file name}\darg{Id: \ldots\ }\oarg
+% {Package Information (version, description)}\\*
+% \hspace*{-\marginparsep}
+% \oarg{file name}\darg{Id: \ldots\ }\oarg
+% {Class Information (version, description)}\\*
+% \hspace*{-\marginparsep}
+% \oarg{file name}\darg{Id: \ldots\ }\oarg
+% {File Information (version, description)}}.
 %
-% \par
-% \DescribeMacro{\ProvidesClassSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg
-% {file name}|{$|Id: \ldots\ |$}|\oarg
-% {Class Information (version, description)}\\
-%
-% \par
-% \DescribeMacro{\ProvidesFileSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg
-% {file name}|{$|Id: \ldots\ |$}|\oarg
-% {File Information (version, description)}\\[\smallskipamount]
 % All of these macros await a valid Subversion Id keyword string as a mandatory 
 % argument. The file name and date is extracted from this string. For cases when 
 % the file source is not stored in the correct file but packed inside a 
@@ -160,8 +211,8 @@
 % \begin{description}
 %   \item[\cs{rev}] File revision.
 %   \item[\cs{Rev}] File revision followed by a space.
-%   \item[\cs{revinfo}] The default information used: ``\texttt{(SVN Rev: 
-%   \meta{revision})}''.
+%   \item[\cs{revinfo}] The default information used: 
+%   ``\texttt{\frenchspacing(SVN Rev: \meta{revision})}''.
 %   \item[\cs{filebase}] File base name (file name without extension).
 %   \item[\cs{fileext}] File extension (without leading dot).
 %   \item[\cs{filename}] File name.
@@ -169,6 +220,7 @@
 %   \item[\cs{filerev}] File revision, like \cs{rev}.
 % \end{description}
 %
+% ^^A\subsection{Other Macros}
 % \par\medskip
 % \DescribeMacro{\GetFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}|*|
 % \\[-\baselineskip]\hspace*{\parindent}The star version of this macro provides 
@@ -299,7 +351,7 @@
 %
 % \endgroup
 % \StopEventually{}
-%
+% \manualnewpage
 % \section{Implementation}
 %    \begin{macrocode}
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]

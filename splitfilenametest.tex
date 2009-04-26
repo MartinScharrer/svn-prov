@@ -9,13 +9,12 @@
 \def\test#1{%
 \par\bigskip\noindent
 Input:~~~~#1\\
-\let\svnprov@filebase\@gobble%
 \def\svnprov@fileext{}%
 \tracingmacros=1
 \tracingassigns=1
 \tracingonline=1
 \tracingcommands=1
-\svnprov@splitfilename#1.\relax
+\svnprov@splitfilename{#1}%
 \tracingmacros=0
 \tracingassigns=0
 \tracingonline=0

@@ -32,12 +32,12 @@
 \def\fileversion{v0.\rev}
 %</driver|package>
 %<*driver>
-\makeatother
 \ProvidesFileSVN{$Id$}
   [\fileversion\space DTX for \filebase.sty]
 \GetFileInfoSVN*
-\let\svnprovversion\fileversion
-\let\svnprovdate\filedate
+\let\svnprov@version\fileversion
+\let\svnprov@date\filedate
+\makeatother
 \documentclass{ltxdoc}
 \usepackage[hyperfootnotes=false]{hyperref}
 
@@ -136,7 +136,9 @@
 % \title{The \textsf{svn-prov} package\\\large Use SVN Id keywords for package, 
 % class and file header}
 % \author{Martin Scharrer \\ \url{martin@scharrer-online.de}}
-% \date{Version~\svnprovversion\ - \svnprovdate}
+% \makeatletter
+% \date{Version~\svnprov@version\ - \svnprov@date}
+% \makeatother
 %
 % \maketitle
 %

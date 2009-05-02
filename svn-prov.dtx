@@ -28,15 +28,13 @@
 \makeatletter
 %</driver>
 %<*driver|package>
-\let\svnprov@orig@fileversion\fileversion
-\def\fileversion{v0.\rev}
+\def\svnprov@version{v0.\rev}
 %</driver|package>
 %<*driver>
 \ProvidesFileSVN{$Id$}
-  [\fileversion\space DTX for \filebase.sty]
-\GetFileInfoSVN*
-\let\svnprov@version\fileversion
-\let\svnprov@date\filedate
+  [\svnprov@version\space DTX for \filebase.sty]
+\DefineFileInfoSVN[svnprov]
+\DefineFileInfoSVN
 \makeatother
 \documentclass{ltxdoc}
 \usepackage[hyperfootnotes=false]{hyperref}
@@ -105,7 +103,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{220}
+% \CheckSum{246}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -244,6 +242,37 @@
 % \cs{filename}, \cs{filedate}, \cs{filerev} and \cs{fileinfo}. The last one 
 % contains the file description, e.g.\ the content of the optional argument 
 % without date and version. The other macros were already described earlier.
+%
+% \par\medskip
+% \DescribeMacro{\DefineFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg{name}\\
+% Defines a set of macros which provide the information collected by a previous 
+% \cs{Provides\ldots} macro. The macros have the form 
+% |\|\meta{name}|@|\meta{data} where \meta{name} is by default the filename 
+% either with the file extension (general files) or without (packages and 
+% classes). This default can be overwritten by the optional argument.
+% The \meta{data} stands for |version|, |rev| (revision), |date| and |info| (the 
+% information part without the version number).
+%
+% \noindent
+% \textit{Example:} Applied to the |.dtx| file of this very package the 
+% following macros are defined:\par
+% \begingroup
+% \makeatletter\centering
+% \begin{tabular}{ll}
+%  Macro  & Definition \\
+%  \hline
+%  \cs{svn-prov.dtx@version} & \@nameuse{svn-prov.dtx@version} \\
+%  \cs{svn-prov.dtx@rev}     & \@nameuse{svn-prov.dtx@rev}     \\
+%  \cs{svn-prov.dtx@date}    & \@nameuse{svn-prov.dtx@date}    \\
+%  \cs{svn-prov.dtx@info}    & \@nameuse{svn-prov.dtx@info}    \\
+% \end{tabular}
+% \\[\medskipamount]
+% The style file however would get macros like \cs{svn-prov@version}.
+% Because `|-|' is not a letter the macros can only be accessed using |\csname|.  
+% Therefore the optional argument |[svnprov]| is used to name the macros
+% \cs{svnprov@version} etc..
+% \endgroup
+%
 %
 % \section{Examples}
 % \begingroup
@@ -577,7 +606,7 @@
     \expandafter\svnprov@getversion
     \svnprov@fileinfo\relax{} \relax\svnprov@endmarker
     \let\fileversion\svnprov@fileversion
-    \let\fileinfo\svnprov@fileinfo
+    \let\fileinfo\svnprov@fileinfoonly
   \else
     \PackageError{svn-prov}{Macro \textbackslash GetFileInfoSVN without '*' is 
     not implemented yet.}{}{}{}%
@@ -600,7 +629,7 @@
   \expandafter
   \let\csname#1@rev\endcsname\svnprov@filerev
   \expandafter
-  \let\csname#1@info\endcsname\svnprov@fileinfo
+  \let\csname#1@info\endcsname\svnprov@fileinfoonly
 }
 %    \end{macrocode}
 % \end{macro}
@@ -614,7 +643,7 @@
     \def\svnprov@fileversion{??}%
   \else
     \def\svnprov@fileversion{#1}%
-    \def\svnprov@fileinfo{#2}%
+    \def\svnprov@fileinfoonly{#2}%
   \fi
 }
 %    \end{macrocode}
@@ -623,15 +652,8 @@
 % Finally, call the macro for this package itself.
 %    \begin{macrocode}
 \ProvidesPackageSVN{$Id$}%
-  [\fileversion\space Package Date/Version from SVN Keywords]
-%    \end{macrocode}
-% The macro \cs{fileversion} is restored to it original value which it had 
-% before this package was loaded.
-%    \begin{macrocode}
-\let\fileversion\svnprov@orig@fileversion
-\let\svnprov@orig@fileversion\@undefined
+  [\svnprov@version\space Package Date/Version from SVN Keywords]
 %    \end{macrocode}
 %
 % \Finale
-\endinput
 

@@ -566,7 +566,7 @@
 %
 % This macro is inspired by the macro \cs{GetFileInfo}\marg{file name} from the 
 % \texttt{doc} package.
-% \begin{macrocode}
+%    \begin{macrocode}
 \def\GetFileInfoSVN#1{%
   \ifx*#1\relax
     \let\filebase\svnprov@filebase
@@ -582,6 +582,25 @@
     \PackageError{svn-prov}{Macro \textbackslash GetFileInfoSVN without '*' is 
     not implemented yet.}{}{}{}%
   \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\DefineFileInfoSVN}
+% Defines macros in the form |\|\meta{filename}|@|\meta{xxx}, where \meta{xxx} 
+% is date, version, rev(ision) and info.
+%    \begin{macrocode}
+\newcommand*\DefineFileInfoSVN[1][\svnprov@filemask]{%
+  \expandafter\svnprov@getversion
+  \svnprov@fileinfo\relax{} \relax\svnprov@endmarker
+  \expandafter
+  \let\csname#1@date\endcsname\svnprov@filedate
+  \expandafter
+  \let\csname#1@version\endcsname\svnprov@fileversion
+  \expandafter
+  \let\csname#1@rev\endcsname\svnprov@filerev
+  \expandafter
+  \let\csname#1@info\endcsname\svnprov@fileinfo
 }
 %    \end{macrocode}
 % \end{macro}

@@ -1,5 +1,9 @@
 Package svn-prov
 ~~~~~~~~~~~~~~~~
+Copyright (C) 2009 Martin Scharrer <martin@scharrer-online.de>
+See the svn-prov.dtx or svn-prov.ins file for the licence information (LPPL).
+
+
 This package introduces Subversion variants of the standard LaTeX macros
 \ProvidesPackage, \ProvidesClass and \ProvidesFile where the file name and date 
 is extracted from Subversion Id keywords. The file name can also be given 

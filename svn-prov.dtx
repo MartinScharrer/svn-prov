@@ -28,7 +28,7 @@
 \makeatletter
 %</driver>
 %<*driver|package>
-\def\svnprov@version{v0.\rev}
+\def\svnprov@version{v1.\rev}
 %</driver|package>
 %<*driver>
 \ProvidesFileSVN{$Id$}
@@ -123,6 +123,7 @@
 %
 %
 % \changes{v0.922}{2009/04/26}{Initial version}
+% \changes{v1.}{2009/05/03}{Added \cs{DefineFileInfoSVN} macro.}
 %
 % ^^A \GetFileInfo{\jobname.dtx}
 %
@@ -244,7 +245,8 @@
 % without date and version. The other macros were already described earlier.
 %
 % \par\medskip
-% \DescribeMacro{\DefineFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg{name}\\
+% \DescribeMacro{\DefineFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg{name}
+% \marginpar{\it New in v1. 2009/05/03}\\
 % Defines a set of macros which provide the information collected by a previous 
 % \cs{Provides\ldots} macro. The macros have the form 
 % |\|\meta{name}|@|\meta{data} where \meta{name} is by default the filename 

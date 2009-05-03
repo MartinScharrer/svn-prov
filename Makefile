@@ -8,7 +8,7 @@ PACKFILES = ${PACKAGE_SRC} ${PACKAGE_DOC} README
 TEXAUX = *.aux *.log *.glo *.ind *.idx *.out *.svn *.svx *.svt *.toc *.ilg *.gls *.hd *.exa *.exb
 INSGENERATED = ${PACKAGE_STY}
 ZIPFILE = ${PACKAGE}-${ZIPVERSION}.zip
-TDSZIPFILE = ${PACKAGE}-${ZIPVERSION}.tds.zip
+TDSZIPFILE = ${PACKAGE}.tds.zip
 GENERATED = ${INSGENERATED} ${PACKAGE}.pdf
 ZIPS = zip tdszip
 
@@ -67,7 +67,9 @@ ${ZIPFILE}: ${PACKFILES}
 	@echo
 	@echo "ZIP file ${ZIPFILE} created!"
 
-tds: package doc
+tds: .tds
+
+.tds: ${PACKAGE_STY} ${PACKAGE_DOC} ${PACKAGE_SRC}
 	@grep -q '\* Checksum passed \*' ${PACKAGE}.log
 	${RMDIR} tds
 	${MKDIR} tds/
@@ -77,6 +79,7 @@ tds: package doc
 	${CP} ${PACKAGE_STY} tds/tex/latex/${PACKAGE}/
 	${CP} ${PACKAGE_DOC} tds/doc/latex/${PACKAGE}/
 	${CP} ${PACKAGE_SRC} tds/source/latex/${PACKAGE}/
+	@touch $@
 
 tdszip: tds
 	${RM} ${TDSZIPFILE}
@@ -84,4 +87,8 @@ tdszip: tds
 
 install: tds
 	test -d "${TEXMFDIR}" && ${CP} -a tds/* "${TEXMFDIR}/" && texhash ${TEXMFDIR}
+
+uninstall:
+	test -d "${TEXMFDIR}" && ${RM} -rv "${TEXMFDIR}/tex/latex/${PACKAGE}" \
+	"${TEXMFDIR}/doc/latex/${PACKAGE}" "${TEXMFDIR}/source/latex/${PACKAGE}" && texhash ${TEXMFDIR}
 

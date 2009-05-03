@@ -81,11 +81,13 @@ tds: .tds
 	${CP} ${PACKAGE_SRC} tds/source/latex/${PACKAGE}/
 	@touch $@
 
-tdszip: tds
+tdszip: ${TDSZIPFILE}
+
+${TDSZIPFILE}: .tds
 	${RM} ${TDSZIPFILE}
 	cd tds && zip -r ../${TDSZIPFILE} .
 
-install: tds
+install: .tds
 	test -d "${TEXMFDIR}" && ${CP} -a tds/* "${TEXMFDIR}/" && texhash ${TEXMFDIR}
 
 uninstall:

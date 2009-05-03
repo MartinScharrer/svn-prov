@@ -53,19 +53,23 @@ fullclean: clean
 	rm -f ${PACKAGE}*.zip
 	rm -rf tds/
 
-zip: fullclean package doc example ${ZIPFILE}
 ${PACKAGE}.zip: zip
 
-${ZIPS}: ZIPVERSION=$(shell grep "Package: ${PACKAGE} " ${PACKAGE}.log | \
+zip: ${PACKAGE}.pdf
+
+zip: ZIPVERSION=$(shell grep "Package: ${PACKAGE} " ${PACKAGE}.log | \
 	sed -e "s/.*Package: ${PACKAGE} ....\/..\/..\s\+\(v\S\+\).*/\1/")
 
-${ZIPFILE}: ${PACKFILES}
+zip:
+	@${MAKE} --no-print-directory ${ZIPFILE}
+
+${PACKAGE}%.zip: ${PACKFILES}
 	grep -q '\* Checksum passed \*' ${PACKAGE}.log
 	-pdfopt ${PACKAGE}.pdf opt_${PACKAGE}.pdf && mv opt_${PACKAGE}.pdf ${PACKAGE}.pdf
-	${RM} ${ZIPFILE}
-	zip ${ZIPFILE} ${PACKFILES}
+	${RM} $@
+	zip $@ ${PACKFILES}
 	@echo
-	@echo "ZIP file ${ZIPFILE} created!"
+	@echo "ZIP file $@ created!"
 
 tds: .tds
 

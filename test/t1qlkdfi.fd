@@ -1,0 +1,3 @@
+\ProvidesFileSVN{$Id$}[Definition of the font qlkdfi]
+\DeclareFontFamily{T1}{qlkdfi}{}
+\DeclareFontShape{T1}{qlkdfi}{m}{n}{ <-> ssub * cmr/m/n }{}

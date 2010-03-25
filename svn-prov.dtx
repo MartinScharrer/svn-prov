@@ -1,7 +1,7 @@
 % \iffalse meta-comment
 % $Id$
 %
-% Copyright (C) 2009 by Martin Scharrer <martin@scharrer-online.de>
+% Copyright (C) 2009-2010 by Martin Scharrer <martin@scharrer-online.de>
 %
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either version 1.3c
@@ -28,7 +28,7 @@
 \makeatletter
 %</driver>
 %<*driver|package>
-\def\svnprov@version{v1.\rev}
+\def\svnprov@version{v2.\rev}
 %</driver|package>
 %<*driver>
 \ProvidesFileSVN{$Id$}
@@ -103,7 +103,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{246}
+% \CheckSum{274}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -124,6 +124,8 @@
 %
 % \changes{v0.922}{2009/04/26}{Initial version}
 % \changes{v1.}{2009/05/03}{Added \cs{DefineFileInfoSVN} macro.}
+% \changes{v2.}{2010/03/25}{Fixed issues when used in font definition \texttt{*.fd} files due to changed catcodes.
+% Also fixed error which occurred when Id line was not expanded.}
 %
 % ^^A \GetFileInfo{\jobname.dtx}
 %
@@ -435,6 +437,8 @@
 \def\svnprov@generic#1#2{%
   \def\svnprov@ltxprov{#1}%
   \def\svnprov@filemask{#2}%
+  \begingroup
+  \svnprov@catcodes
   \@ifnextchar{[}%
     {\svnprov@getid}%
     {\svnprov@getid[\svnprov@svnfilename]}%
@@ -442,14 +446,34 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\svnprov@generic}
+% \begin{macro}{\svnprov@catcodes}
+% Sets the normal catcodes for all characters required by the |getid| macro.
+%    \begin{macrocode}
+\def\svnprov@catcodes{%
+  \catcode`\ =10%
+  \catcode`\$=3%
+  \@makeother\:%
+  \@makeother\-%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% Enforce normal catcodes for the definition of the |Id| scanning macros.
+% This makes sure that all scan patterns have the same catcodes during definition and execution.
+%    \begin{macrocode}
+\begingroup
+\svnprov@catcodes
+%    \end{macrocode}
+%
+% \begin{macro}{\svnprov@getid}
 % Saves first argument as filename and calls the scan macro with the second.
 % A fall-back string is provided to avoid \TeX\ parsing errors.
 %    \begin{macrocode}
-\def\svnprov@getid[#1]#2{%
+\gdef\svnprov@getid[#1]#2{%
+  \endgroup
   \def\svnprov@filename{#1}%
   \svnprov@scanid #2\relax $%
-    Id: unknown.xxx 0 0000-00-00 00:00:00Z user $\svnprov@endmarker
+    Id: unknown.xxx 0 0000-00-00 00:00:00Z user $\empty\svnprov@endmarker
 }
 %    \end{macrocode}
 % \end{macro}
@@ -460,11 +484,14 @@
 % Otherwise a warning message is printed. In both cases any remaining text of 
 % the parsing procedure is gobbled before the next step.
 % \begin{macrocode}
-\def\svnprov@scanid#1$%
+\gdef\svnprov@scanid#1$%
   Id: #2 #3 #4-#5-#6 #7 $#8{%
   \def\next{%
-    \PackageWarning{svn-prov}{Did not found valid SVN Id line in file 
-    '#2'.}{}{}{}%
+    \begingroup
+    \def\@tempa####1>####2 {####2}%
+    \PackageWarning{svn-prov}{Invalid SVN Id line found! File name might be
+    '#2' or '\expandafter\@tempa\meaning\@filef@und'. This occured}{}{}{}%
+    \endgroup
     \svnprov@gobbleopt
   }%
   \ifx\relax#1\relax
@@ -473,13 +500,18 @@
       \svnprov@splitfilename{#2}%
       \def\svnprov@filerev{#3}%
       \def\svnprov@filedate{#4/#5/#6}%
-      \def\next{\svnprov@buildstring}%
+      \def\next{\begingroup\svnprov@catcodes\svnprov@buildstring}%
     \fi
   \fi
   \expandafter\next\svnprov@gobblerest
 }% $
 %    \end{macrocode}
 % \end{macro}
+%
+% End of area with enforced catcodes.
+%    \begin{macrocode}
+\endgroup
+%    \end{macrocode}
 %
 % \begin{macro}{\svnprov@splitfilename}
 % Expands the argument and initialises the file base macro before it calls the 
@@ -563,6 +595,7 @@
 % filename and information.
 %    \begin{macrocode}
 \newcommand*\svnprov@buildstring[1][\svnprov@defaultdesc]{%
+  \endgroup
   \begingroup
     \let\rev\svnprov@filerev
     \let\filerev\svnprov@filerev

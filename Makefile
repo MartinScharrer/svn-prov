@@ -64,7 +64,7 @@ fullclean: clean
 	rm -rf tds/
 
 
-zip: ${PACKFILES}
+zip: ${PACKFILES} pdfopt
 	@${MAKE} --no-print-directory ${ZIPFILE}
 
 zip: ZIPVERSION=$(shell grep "Package: ${PACKAGE} " ${PACKAGE}.log | \
@@ -75,13 +75,16 @@ tdszip: ZIPVERSION=$(shell grep "Package: ${PACKAGE} " ${PACKAGE}.log | \
 
 ${PACKAGE}%.zip: ${PACKFILES}
 	@test -n "${IGNORE_CHECKSUM}" || grep -L '\* Checksum passed \*' ${PACKAGE_DTX:.dtx=.log} | wc -l | grep -q '^0$$'
-	-pdfopt ${PACKAGE}.pdf opt_${PACKAGE}.pdf && mv opt_${PACKAGE}.pdf ${PACKAGE}.pdf
 	${RM} $@
 	zip $@ ${PACKFILES}
 	@echo
 	@echo "ZIP file $@ created!"
 
 release: fullclean package doc example tests zip
+
+pdfopt:	.${PACKAGE}.opt
+.${PACKAGE}.opt: ${PACKAGE}.pdf
+	-pdfopt "$<" "$@" && cp "$@" "$<" && touch --reference="$<" "$@"
 
 ###############################################################################
 
@@ -109,7 +112,7 @@ ${TESTS}: % : ${TESTDIR}/%.tex package testclean
 
 tds: .tds
 
-.tds: ${PACKAGE_STY} ${PACKAGE_DOC} ${PACKAGE_SRC}
+.tds: ${PACKAGE_STY} ${PACKAGE_DOC} ${PACKAGE_SRC} pdfopt
 	@grep -q '\* Checksum passed \*' ${PACKAGE}.log
 	${RMDIR} tds
 	${MKDIR} tds/

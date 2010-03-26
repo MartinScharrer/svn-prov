@@ -39,7 +39,7 @@ MKDIR = mkdir -p
 all: package doc example
 new: fullclean all
 
-doc: ${PACKAGE_DOC}
+doc: ${PACKAGE_DOC} pdfopt
 
 package: ${PACKAGE_STY} ${PACKAGE_SCR}
 
@@ -64,7 +64,7 @@ fullclean: clean
 	rm -rf tds/
 
 
-zip: ${PACKFILES} pdfopt
+zip: ${PACKFILES}
 	@${MAKE} --no-print-directory ${ZIPFILE}
 
 zip: ZIPVERSION=$(shell grep "Package: ${PACKAGE} " ${PACKAGE}.log | \
@@ -112,7 +112,7 @@ ${TESTS}: % : ${TESTDIR}/%.tex package testclean
 
 tds: .tds
 
-.tds: ${PACKAGE_STY} ${PACKAGE_DOC} ${PACKAGE_SRC} pdfopt
+.tds: ${PACKAGE_STY} ${PACKAGE_DOC} ${PACKAGE_SRC}
 	@grep -q '\* Checksum passed \*' ${PACKAGE}.log
 	${RMDIR} tds
 	${MKDIR} tds/

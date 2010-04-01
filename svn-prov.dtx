@@ -33,8 +33,8 @@
 %<*driver>
 \ProvidesFileSVN{$Id$}
   [\svnprov@version\space DTX for \filebase.sty]
-\DefineFileInfoSVN
-\DefineFileInfoSVN[svnprov]
+\DefineFileInfoSVN[svnprov]  % Used internally
+\DefineFileInfoSVN           % Needed for example
 % Re-require package to check date
 \RequirePackage{svn-prov}[\svnprov@date]
 \makeatother
@@ -106,7 +106,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{375}
+% \CheckSum{376}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -632,13 +632,9 @@
 % \end{macro}
 %
 % \begin{macro}{\GetFileInfoSVN}
-% At the moment this macro \textbf{must} be called with a star `|*|' which 
-% indicated that the current file is to be used. Other arguments are not 
-% implemented yet.
-% 
-% The macro provides the file information of ``the current file'', i.e.\ the 
-% last file which called one of the above \cs{Provides\ldots} macros. For this 
-% the internal macros are simply copied to user-friendly names.
+% \changes{v3.}{2010/04/01}{Added non-star version.}
+% The macro provides the file information of the given file, or (the star version) the last file which called one of the above \cs{Provides\ldots} macros.
+% For this the internal macros are simply copied to user-friendly names.
 %
 % This macro is inspired by the macro \cs{GetFileInfo}\marg{file name} from the 
 % \texttt{doc} package.
@@ -678,8 +674,8 @@
 % \end{macro}
 %
 % \begin{macro}{\DefineFileInfoSVN}
-% Defines macros in the form |\|\meta{filename}|@|\meta{xxx}, where \meta{xxx} 
-% is date, version, rev(ision) and info.
+% Defines macros in the form |\|\meta{filename}|@|\meta{xxx}, where \meta{xxx} is |date|, |version|, |rev|(ision), |info|, (file name)|base| and |ext|(ension).
+% \changes{v3.}{2010/04/01}{Added file name `base' and 'ext'(ension).}
 %    \begin{macrocode}
 \newcommand*\DefineFileInfoSVN[1][\svnprov@filemask]{%
   \svnprov@getversion\svnprov@fileinfo
@@ -708,6 +704,7 @@
 % everything until the first space is taken as version number. Otherwise
 % the whole text is taken as description without version.
 % Special care is taken to avoid a parser error if there is no space included.
+% \changes{v3.}{2010/04/01}{Changed to look for leading `v' not just everything up to the first space.}
 %    \begin{macrocode}
 \def\svnprov@getversion#1{%
   \begingroup
@@ -736,10 +733,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% Finally, call the macro for this package itself.
+% Finally, call the macros for this package itself.
 %    \begin{macrocode}
 \ProvidesPackageSVN{$Id$}%
   [\svnprov@version\space Package Date/Version from SVN Keywords]
+\DefineFileInfoSVN[svnprov]
 %    \end{macrocode}
 %
 % \Finale

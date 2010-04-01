@@ -1,0 +1,60 @@
+%&pdflatex
+\documentclass{article}
+
+\usepackage{svn-prov}
+
+\ProvidesFileSVN{$Id: first.tex 1747 2010-03-01 20:25:48Z martin $}[v1 a]
+\DefineFileInfoSVN
+
+\ProvidesFileSVN{$Id: second.cfg 1747 2010-03-02 20:25:48Z martin $}
+\DefineFileInfoSVN[second]
+
+\ProvidesFileSVN{$Id: third.abc 1747 2010-03-03 20:25:48Z martin $}[Description without version number]
+\DefineFileInfoSVN[third]
+
+\ProvidesFileSVN{$Id: fourth.def 1747 2010-03-04 20:25:48Z martin $}[v4.0] % version only
+\DefineFileInfoSVN[fourth]
+
+
+\tracingassigns=1
+\GetFileInfoSVN*
+\tracingassigns=0
+
+\parindent=0pt
+\begin{document}
+
+\def\info{%
+Name: \filename \\
+Base: \filebase \\
+Ext:  \fileext  \\
+Date: \filedate \\
+Rev: \filerev \\
+Version: '\fileversion' \\
+Info: '\fileinfo' \\
+}
+\info
+
+\tracingassigns=1
+\GetFileInfoSVN{first.tex}
+\tracingassigns=0
+
+\info
+
+\let\filename\relax
+\let\filedate\relax
+\let\fileinfo\relax
+
+\tracingassigns=1
+\GetFileInfoSVN{second}
+\tracingassigns=0
+\info
+
+\GetFileInfoSVN{third}
+\info
+
+\GetFileInfoSVN{fourth}
+\info
+
+\end{document}
+
+

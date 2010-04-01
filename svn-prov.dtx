@@ -106,7 +106,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{355}
+% \CheckSum{375}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -212,11 +212,12 @@
 % predefined and therefore ignored this is not needed for them when they are 
 % packed inside a corresponding |.dtx| file, i.e. one with the same base name.  
 %
-% As with the standard macros mentioned above an optional argument can be given 
-% afterwards which contains additional information (date, version, description) 
-% of the package, class or file.  However, the SVN macros automatically insert 
-% the date, so only a version number and a short description should be given. If 
-% this argument is not given a default information string is used which is shown 
+% As with the standard macros mentioned above an optional argument can be given
+% afterwards which contains additional information (date, version, description)
+% of the package, class or file.  However, the SVN macros automatically insert
+% the date, so only a version number (must start with `|v|' and not include spaces)
+% and a short description should be given. If
+% this argument is not given a default information string is used which is shown
 % below as \cs{revinfo}.
 %
 % Both optional arguments can include the following macros which are only valid
@@ -247,7 +248,8 @@
 %
 % The star version of this macro provides the file information of the last file which called one of the \cs{Provides\ldots SVN} macros.
 %
-% The macro \cs{fileinfo} holds the file description, e.g.\ the content of the optional argument without date and version.
+% The macros \cs{fileversion} and \cs{fileinfo} hold the file version and description taken from optional argument of the \cs{Provide...SVN} macro.
+% The version is defined only if this argument starts with `|v|' and is otherwise empty. It includes all text up to the first space.
 % The other macros are described above.
 %
 %
@@ -648,8 +650,7 @@
     \let\filename\svnprov@filename
     \let\filedate\svnprov@filedate
     \let\filerev\svnprov@filerev
-    \expandafter\svnprov@getversion
-    \svnprov@fileinfo\relax{} \relax\svnprov@endmarker
+    \svnprov@getversion\svnprov@fileinfo
     \let\fileversion\svnprov@fileversion
     \let\fileinfo\svnprov@fileinfoonly
   \else
@@ -681,8 +682,7 @@
 % is date, version, rev(ision) and info.
 %    \begin{macrocode}
 \newcommand*\DefineFileInfoSVN[1][\svnprov@filemask]{%
-  \expandafter\svnprov@getversion
-  \svnprov@fileinfo\relax{} \relax\svnprov@endmarker
+  \svnprov@getversion\svnprov@fileinfo
   \expandafter
   \edef\csname\svnprov@filemask @short\endcsname{#1}%
   \expandafter
@@ -704,17 +704,35 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@getversion}
-% Splits the string at the first space into arguments \#1 (version) and \#2 
-% (info).  Argument \#3 will be empty if there was no space in the string.
+% Checks if the argument (a file description) starts with `|v|'. If so
+% everything until the first space is taken as version number. Otherwise
+% the whole text is taken as description without version.
+% Special care is taken to avoid a parser error if there is no space included.
 %    \begin{macrocode}
-\def\svnprov@getversion#1 #2\relax#3\svnprov@endmarker{%
-  \if&#3&%
-    \def\svnprov@fileversion{??}%
+\def\svnprov@getversion#1{%
+  \begingroup
+  \edef\@tempa{#1\space}%
+  \expandafter\endgroup
+  \expandafter\svnprov@@getversion\@tempa\svnprov@endmarker
+}
+\def\svnprov@@getversion{%
+  \@ifnextchar{v}%
+    {\svnprov@getversion@}%
+    {\svnprov@getversion@@}%
+}
+\def\svnprov@getversion@#1 #2\svnprov@endmarker{%
+  \def\svnprov@fileversion{#1}%
+  \ifx&#2&%
+    \def\svnprov@fileinfoonly{}%
   \else
-    \def\svnprov@fileversion{#1}%
-    \def\svnprov@fileinfoonly{#2}%
+    \edef\svnprov@fileinfoonly{\svnprov@zapspace#2\svnprov@endmarker}%
   \fi
 }
+\def\svnprov@getversion@@#1 \svnprov@endmarker{%
+  \def\svnprov@fileversion{}%
+  \def\svnprov@fileinfoonly{#1}%
+}
+\def\svnprov@zapspace#1 \svnprov@endmarker{#1}
 %    \end{macrocode}
 % \end{macro}
 %

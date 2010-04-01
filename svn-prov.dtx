@@ -28,13 +28,14 @@
 \makeatletter
 %</driver>
 %<*driver|package>
-\def\svnprov@version{v2.\rev}
+\def\svnprov@version{v3.\rev}
 %</driver|package>
 %<*driver>
 \ProvidesFileSVN{$Id$}
   [\svnprov@version\space DTX for \filebase.sty]
 \DefineFileInfoSVN[svnprov]
-\DefineFileInfoSVN
+% Re-require package to check date
+\RequirePackage{svn-prov}[\svnprov@date]
 \makeatother
 \documentclass{ltxdoc}
 \usepackage[hyperfootnotes=false]{hyperref}
@@ -430,7 +431,7 @@
 % \end{macro}
 %
 % \begin{macro}{\svnprov@generic}
-% Stores the arguments (1: original macro, 2: file mask (full filename of only 
+% Stores the arguments (1: original macro, 2: file mask (full filename if only 
 % base is used?)). Then tests if a explicit file name was given as optional 
 % argument.  If not the file name from the SVN Id string is used.
 %    \begin{macrocode}
@@ -643,8 +644,21 @@
     \let\fileversion\svnprov@fileversion
     \let\fileinfo\svnprov@fileinfoonly
   \else
-    \PackageError{svn-prov}{Macro \textbackslash GetFileInfoSVN without '*' is 
-    not implemented yet.}{}{}{}%
+%    \end{macrocode}
+% Given argument could be filename or short name.
+% If a short name exists for the argument it was a filename is is defined as such,
+% otherwise the filename is read from the |\|\meta{short name}|@long| macro.
+%    \begin{macrocode}
+    \expandafter\let\expandafter\@gtempa\csname#1@short\endcsname%
+    \ifx\@gtempa\relax
+      \def\@gtempa{#1}%
+      \expandafter\let\expandafter\filename\csname#1@long\endcsname
+    \else
+      \edef\filename{#1}%
+    \fi
+    \expandafter\let\expandafter\filedate\csname\@gtempa @date\endcsname
+    \expandafter\let\expandafter\filerev \csname\@gtempa @rev\endcsname
+    \expandafter\let\expandafter\fileinfo\csname\@gtempa @info\endcsname
   \fi
 }
 %    \end{macrocode}
@@ -657,6 +671,10 @@
 \newcommand*\DefineFileInfoSVN[1][\svnprov@filemask]{%
   \expandafter\svnprov@getversion
   \svnprov@fileinfo\relax{} \relax\svnprov@endmarker
+  \expandafter
+  \edef\csname\svnprov@filemask @short\endcsname{#1}%
+  \expandafter
+  \edef\csname#1@long\endcsname{\svnprov@filemask}%
   \expandafter
   \let\csname#1@date\endcsname\svnprov@filedate
   \expandafter

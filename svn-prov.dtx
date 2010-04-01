@@ -33,12 +33,14 @@
 %<*driver>
 \ProvidesFileSVN{$Id$}
   [\svnprov@version\space DTX for \filebase.sty]
+\DefineFileInfoSVN
 \DefineFileInfoSVN[svnprov]
 % Re-require package to check date
 \RequirePackage{svn-prov}[\svnprov@date]
 \makeatother
 \documentclass{ltxdoc}
 \usepackage[hyperfootnotes=false]{hyperref}
+\usepackage{booktabs}
 
 \makeatletter
 %%% Examples %%%
@@ -104,7 +106,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{324}
+% \CheckSum{355}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -238,7 +240,7 @@
 % \hspace*{-\parindent}\hspace{-\marginparsep}\marg{name}\\
 % \hspace*{-\marginparsep}|*|\\
 % \hspace*{\parindent}\relax
-% This macro sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{filerev} and \cs{fileinfo} to
+% This macro sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{fileversion}, \cs{filerev} and \cs{fileinfo} to
 % the corresponding values of the file given by \meta{name}. The file must have been read/loaded before and use
 % both a \cs{Provides\ldots SVN} macro and \cs{DefineFileInfoSVN}, otherwise the above macros will be set to |\relax|.
 % The \meta{name} can be either the real filename or the optional short name used with \cs{DefineFileInfoSVN}.
@@ -249,7 +251,6 @@
 % The other macros are described above.
 %
 %
-%
 % \par\medskip
 % \DescribeMacro{\DefineFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg{name}
 % \marginpar{\it New in v1. 2009/05/03}\\
@@ -258,8 +259,9 @@
 % |\|\meta{name}|@|\meta{data} where \meta{name} is by default the filename 
 % either with the file extension (general files) or without (packages and 
 % classes). This default can be overwritten by the optional argument.
-% The \meta{data} stands for |version|, |rev| (revision), |date| and |info| (the 
-% information part without the version number).
+% The \meta{data} stands for |version|, |rev| (revision), |date| and |info|
+% (the information part without the version number)
+% and, since v3, file name |base| and |ext|(ension).
 %
 % \noindent
 % \textit{Example:} Applied to the |.dtx| file of this very package the 
@@ -267,12 +269,16 @@
 % \begingroup
 % \makeatletter\centering
 % \begin{tabular}{ll}
+%  \toprule
 %  Macro  & Definition \\
-%  \hline
+%  \midrule
 %  \cs{svn-prov.dtx@version} & \@nameuse{svn-prov.dtx@version} \\
 %  \cs{svn-prov.dtx@rev}     & \@nameuse{svn-prov.dtx@rev}     \\
 %  \cs{svn-prov.dtx@date}    & \@nameuse{svn-prov.dtx@date}    \\
 %  \cs{svn-prov.dtx@info}    & \@nameuse{svn-prov.dtx@info}    \\
+%  \cs{svn-prov.dtx@base}    & \@nameuse{svn-prov.dtx@base}    \\
+%  \cs{svn-prov.dtx@ext}     & \@nameuse{svn-prov.dtx@ext}     \\
+%  \bottomrule
 % \end{tabular}
 % \\[\medskipamount]
 % The style file however would get macros like \cs{svn-prov@version}.
@@ -659,8 +665,11 @@
     \else
       \edef\filename{#1}%
     \fi
+    \expandafter\let\expandafter\filebase\csname\@gtempa @base\endcsname
+    \expandafter\let\expandafter\fileext \csname\@gtempa @ext\endcsname
     \expandafter\let\expandafter\filedate\csname\@gtempa @date\endcsname
     \expandafter\let\expandafter\filerev \csname\@gtempa @rev\endcsname
+    \expandafter\let\expandafter\fileversion\csname\@gtempa @version\endcsname
     \expandafter\let\expandafter\fileinfo\csname\@gtempa @info\endcsname
   \fi
 }
@@ -678,6 +687,10 @@
   \edef\csname\svnprov@filemask @short\endcsname{#1}%
   \expandafter
   \edef\csname#1@long\endcsname{\svnprov@filemask}%
+  \expandafter
+  \let\csname#1@base\endcsname\svnprov@filebase
+  \expandafter
+  \let\csname#1@ext\endcsname\svnprov@fileext
   \expandafter
   \let\csname#1@date\endcsname\svnprov@filedate
   \expandafter

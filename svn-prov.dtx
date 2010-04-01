@@ -104,7 +104,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{274}
+% \CheckSum{324}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -217,8 +217,8 @@
 % this argument is not given a default information string is used which is shown 
 % below as \cs{revinfo}.
 %
-% Both optional arguments can include the following macros which are only valid 
-% inside them, but not afterwards:
+% Both optional arguments can include the following macros which are only valid
+% inside them, but not afterwards\footnote{They can be set using \cs{GetFileInfoSVN}}:
 % \begin{description}
 %   \item[\cs{rev}] File revision.
 %   \item[\cs{Rev}] File revision followed by a space.
@@ -233,19 +233,22 @@
 %
 % ^^A\subsection{Other Macros}
 % \par\medskip
-% \DescribeMacro{\GetFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}|*|
-% \\[-\baselineskip]\hspace*{\parindent}The star version of this macro provides 
-% the file information of the last file which called one of the 
-% \cs{Provides\ldots SVN} macros. It is meant to be used inside a |.dtx| file 
-% directly after the provide macro so that the file information can be typeset 
-% inside the documentation.
+% \DescribeMacro{\GetFileInfoSVN}\relax
+% \DescribeMacro{\GetFileInfoSVN}\relax
+% \hspace*{-\parindent}\hspace{-\marginparsep}\marg{name}\\
+% \hspace*{-\marginparsep}|*|\\
+% \hspace*{\parindent}\relax
+% This macro sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{filerev} and \cs{fileinfo} to
+% the corresponding values of the file given by \meta{name}. The file must have been read/loaded before and use
+% both a \cs{Provides\ldots SVN} macro and \cs{DefineFileInfoSVN}, otherwise the above macros will be set to |\relax|.
+% The \meta{name} can be either the real filename or the optional short name used with \cs{DefineFileInfoSVN}.
 %
-% A `normal', non-star version is not yet implemented.
+% The star version of this macro provides the file information of the last file which called one of the \cs{Provides\ldots SVN} macros.
 %
-% The provided information macros are \cs{filebase}, \cs{fileext}, 
-% \cs{filename}, \cs{filedate}, \cs{filerev} and \cs{fileinfo}. The last one 
-% contains the file description, e.g.\ the content of the optional argument 
-% without date and version. The other macros were already described earlier.
+% The macro \cs{fileinfo} holds the file description, e.g.\ the content of the optional argument without date and version.
+% The other macros are described above.
+%
+%
 %
 % \par\medskip
 % \DescribeMacro{\DefineFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg{name}

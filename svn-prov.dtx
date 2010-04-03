@@ -32,6 +32,7 @@
 %<*driver>
 \ProvidesFileSVN{$Id$}
   [\svnprov@version\space DTX for \filebase.sty]
+\DefineFileInfoSVN
 \GetFileInfoSVN*
 % Re-require package to check date
 \RequirePackage{svn-prov}[\filedate]
@@ -39,6 +40,7 @@
 \documentclass{ltxdoc}
 \usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{booktabs}
+\usepackage{ydoc-desc}
 
 \makeatletter
 %%% Examples %%%
@@ -75,6 +77,7 @@
 
 
 \usepackage{xspace}
+\let\pkg\relax
 \newcommand*{\pkg}[1]{%
   \href{http://tug.ctan.org/pkg/#1}{\texttt{#1}}%
   % URL footnote (for print-out) on first appearance:
@@ -187,19 +190,9 @@
 %
 % ^^A\subsection{Main Macros}
 % \manualnewpage%%
-% \DescribeMacro{\ProvidesPackageSVN}
-% \DescribeMacro{\ProvidesClassSVN}
-% \DescribeMacro{\ProvidesFileSVN}
-% \hspace*{-\parindent}\hspace{-\marginparsep}
-% {\oarg
-% {file name}\darg{Id: \ldots\ }\oarg
-% {Package Information (version, description)}\\*
-% \hspace*{-\marginparsep}
-% \oarg{file name}\darg{Id: \ldots\ }\oarg
-% {Class Information (version, description)}\\*
-% \hspace*{-\marginparsep}
-% \oarg{file name}\darg{Id: \ldots\ }\oarg
-% {File Information (version, description)}}.
+% \DescribeMacro\ProvidesPackageSVN [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
+% \DescribeMacro\ProvidesClassSVN   [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
+% \DescribeMacro\ProvidesFileSVN    [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
 %
 % All of these macros await a valid Subversion Id keyword string as a mandatory 
 % argument. The file name and date is extracted from this string. For cases when 
@@ -209,15 +202,15 @@
 % predefined and therefore ignored this is not needed for them when they are 
 % packed inside a corresponding |.dtx| file, i.e. one with the same base name.  
 %
-% As with the standard macros mentioned above an optional argument can be given
-% afterwards which contains additional information (date, version, description)
-% of the package, class or file.  However, the SVN macros automatically insert
-% the date, so only a version number (must start with `|v|' and not include spaces)
-% and a short description should be given. If
-% this argument is not given a default information string is used which is shown
-% below as \cs{revinfo}.
+% As with the standard macros mentioned above additional information can be given optionally.
+% Since v0.3 the SVN macro provide two optional arguments (before only one). 
+% If only one optional argument is given it is taken as a description text which may start 
+% with an potential version number. This version number must start with `|v|' and not include spaces
+% and is extracted from the description. 
+% Alternatively the version number and the description can be provided using two separate optional arguments.
+% If no optional argument is given the default string \cs{revinfo} (see below) is used instead.
 %
-% Both optional arguments can include the following macros which are only valid
+% All three optional arguments can include the following macros which are only valid
 % inside them, but not afterwards\footnote{They can be set using \cs{GetFileInfoSVN}}:
 % \begin{description}
 %   \item[\cs{rev}] File revision.
@@ -233,11 +226,8 @@
 %
 % ^^A\subsection{Other Macros}
 % \par\medskip
-% \DescribeMacro{\GetFileInfoSVN}\relax
-% \DescribeMacro{\GetFileInfoSVN}\relax
-% \hspace*{-\parindent}\hspace{-\marginparsep}\marg{name}\\
-% \hspace*{-\marginparsep}|*|\\
-% \hspace*{\parindent}\relax
+% \DescribeMacro\GetFileInfoSVN{<name>}
+% \DescribeMacro\GetFileInfoSVN*
 % This macro sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{fileversion}, \cs{filerev} and \cs{fileinfo} to
 % the corresponding values of the file given by \meta{name}. The file must have been read/loaded before and use
 % both a \cs{Provides\ldots SVN} macro and \cs{DefineFileInfoSVN}, otherwise the above macros will be set to |\relax|.
@@ -251,9 +241,9 @@
 %
 %
 % \par\medskip
-% \DescribeMacro{\DefineFileInfoSVN}\hspace*{-\parindent}\hspace{-\marginparsep}\oarg{name}
-% \marginpar{\it New in v1. 2009/05/03}\\
-% Defines a set of macros which provide the information collected by a previous 
+% \DescribeMacro\DefineFileInfoSVN[name]
+% Defined\marginpar{\it New in v1. 2009/05/03}
+% a set of macros which provide the information collected by a previous 
 % \cs{Provides\ldots} macro. The macros have the form 
 % |\|\meta{name}|@|\meta{data} where \meta{name} is by default the filename 
 % either with the file extension (general files) or without (packages and 
@@ -339,6 +329,20 @@
 %   \ProvidesFileSVN
 %     {$Id$}
 %     [v1.0 Example Description]
+% \end{example}
+%
+% \subsubsection*{Normal Usage with only Description}
+% \begin{example}
+%   \ProvidesFileSVN
+%     {$Id$}
+%     [Example Description]
+% \end{example}
+%
+% \subsubsection*{Normal Usage with separate Version and Description}
+% \begin{example}
+%   \ProvidesFileSVN
+%     {$Id$}
+%     [v1.0][Example Description]
 % \end{example}
 %
 % \subsubsection*{Overwriting Name}

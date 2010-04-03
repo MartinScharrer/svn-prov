@@ -25,7 +25,6 @@
 % \iffalse
 %<*driver>
 \RequirePackage{svn-prov}
-\makeatletter
 %</driver>
 %<*driver|package>
 \def\svnprov@version{v3.\rev}
@@ -33,11 +32,10 @@
 %<*driver>
 \ProvidesFileSVN{$Id$}
   [\svnprov@version\space DTX for \filebase.sty]
-\DefineFileInfoSVN[svnprov]  % Used internally
-\DefineFileInfoSVN           % Needed for example
+\GetFileInfoSVN*
 % Re-require package to check date
-\RequirePackage{svn-prov}[\svnprov@date]
-\makeatother
+\RequirePackage{svn-prov}[\filedate]
+
 \documentclass{ltxdoc}
 \usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{booktabs}
@@ -106,7 +104,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{376}
+% \CheckSum{398}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -140,9 +138,8 @@
 % \title{The \textsf{svn-prov} package\\\large Use SVN Id keywords for package, 
 % class and file header}
 % \author{Martin Scharrer \\ \url{martin@scharrer-online.de}}
-% \makeatletter
-% \date{Version~\svnprov@version\ - \svnprov@date}
-% \makeatother
+% \GetFileInfoSVN{svnprov}
+% \date{Version~\fileversion\ - \filedate}
 %
 % \maketitle
 %
@@ -407,6 +404,11 @@
 % \StopEventually{}
 % \manualnewpage
 % \section{Implementation}
+%
+% \iffalse
+%<*package>
+% \fi
+%
 %    \begin{macrocode}
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %    \end{macrocode}
@@ -560,7 +562,7 @@
     \fi
     \let\next\relax
   \else
-    \xdef\svnprov@filebase@{\svnprov@filebase.#1}%
+    \xdef\svnprov@filebase@{\svnprov@filebase@.#1}%
     \def\next{\svnprov@splitfilename@#2\relax}%
   \fi
   \next
@@ -628,9 +630,24 @@
       \svnprov@splitfilename{\svnprov@filename}%
     \fi
     \let\filename\svnprov@filename
-    \xdef\svnprov@fileinfo@{#1}%
+    \ifx\relax#2\empty
+      \xdef\svnprov@fileinfo@{#1}%
+      \svnprov@getversion{#1}%
+      \global\let\svnprov@filedesc@\svnprov@filedesc@
+      \global\let\svnprov@fileinfo@\svnprov@fileinfo@
+    \else
+      \xdef\svnprov@fileversion@{#1}%
+      \xdef\svnprov@filedesc@{#2}%
+      \xdef\svnprov@fileinfo@{#1 #2}%
+    \fi
   \endgroup
-  \svnprov@ltxprov{\svnprov@filemask}[\svnprov@filedate@\space\svnprov@fileinfo@]%
+  \svnprov@ltxprov{\svnprov@filemask}%
+    [\svnprov@filedate@
+     \ifx\svnprov@fileinfo@\empty\else
+      \space
+      \svnprov@fileinfo@
+     \fi
+   ]%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -650,9 +667,8 @@
     \let\filename\svnprov@filename
     \let\filedate\svnprov@filedate@
     \let\filerev\svnprov@filerev@
-    \svnprov@getversion\svnprov@fileinfo@
     \let\fileversion\svnprov@fileversion@
-    \let\fileinfo\svnprov@fileinfoonly@
+    \let\fileinfo\svnprov@filedesc@
   \else
 %    \end{macrocode}
 % Given argument could be filename or short name.
@@ -682,7 +698,6 @@
 % \changes{v3.}{2010/04/01}{Added file name `base' and 'ext'(ension).}
 %    \begin{macrocode}
 \newcommand*\DefineFileInfoSVN[1][\svnprov@filemask]{%
-  \svnprov@getversion\svnprov@fileinfo@
   \expandafter
   \edef\csname\svnprov@filemask @short\endcsname{#1}%
   \expandafter
@@ -698,7 +713,7 @@
   \expandafter
   \let\csname#1@rev\endcsname\svnprov@filerev@
   \expandafter
-  \let\csname#1@info\endcsname\svnprov@fileinfoonly@
+  \let\csname#1@info\endcsname\svnprov@filedesc@
 }
 %    \end{macrocode}
 % \end{macro}
@@ -711,9 +726,7 @@
 % \changes{v3.}{2010/04/01}{Changed to look for leading `v' not just everything up to the first space.}
 %    \begin{macrocode}
 \def\svnprov@getversion#1{%
-  \begingroup
   \edef\@tempa{#1\space}%
-  \expandafter\endgroup
   \expandafter\svnprov@@getversion\@tempa\svnprov@endmarker
 }
 \def\svnprov@@getversion{%
@@ -722,16 +735,16 @@
     {\svnprov@getversion@@}%
 }
 \def\svnprov@getversion@#1 #2\svnprov@endmarker{%
-  \def\svnprov@fileversion@{#1}%
+  \gdef\svnprov@fileversion@{#1}%
   \ifx&#2&%
-    \def\svnprov@fileinfoonly@{}%
+    \gdef\svnprov@filedesc@{}%
   \else
-    \edef\svnprov@fileinfoonly@{\svnprov@zapspace#2\svnprov@endmarker}%
+    \xdef\svnprov@filedesc@{\svnprov@zapspace#2\svnprov@endmarker}%
   \fi
 }
 \def\svnprov@getversion@@#1 \svnprov@endmarker{%
-  \def\svnprov@fileversion@{}%
-  \def\svnprov@fileinfoonly@{#1}%
+  \gdef\svnprov@fileversion@{}%
+  \gdef\svnprov@filedesc@{#1}%
 }
 \def\svnprov@zapspace#1 \svnprov@endmarker{#1}
 %    \end{macrocode}
@@ -743,6 +756,10 @@
   [\svnprov@version\space Package Date/Version from SVN Keywords]
 \DefineFileInfoSVN[svnprov]
 %    \end{macrocode}
+%
+% \iffalse
+%</package>
+% \fi
 %
 % \Finale
 

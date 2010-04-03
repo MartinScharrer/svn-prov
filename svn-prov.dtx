@@ -416,7 +416,7 @@
 % used as filename.
 %    \begin{macrocode}
 \def\ProvidesClassSVN{%
-  \svnprov@generic\ProvidesClass{\svnprov@filebase}%
+  \svnprov@generic\ProvidesClass{\svnprov@filebase@}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -426,7 +426,7 @@
 % used as filename.
 %    \begin{macrocode}
 \def\ProvidesFileSVN{%
-  \svnprov@generic\ProvidesFile{\svnprov@filebase.\svnprov@fileext}%
+  \svnprov@generic\ProvidesFile{\svnprov@filebase@.\svnprov@fileext@}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -436,7 +436,7 @@
 % used as filename.
 %    \begin{macrocode}
 \def\ProvidesPackageSVN{%
-  \svnprov@generic\ProvidesPackage{\svnprov@filebase}%
+  \svnprov@generic\ProvidesPackage{\svnprov@filebase@}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -500,9 +500,8 @@
   Id: #2 #3 #4-#5-#6 #7 $#8{%
   \def\next{%
     \begingroup
-    \def\@tempa####1>####2 {####2}%
     \PackageWarning{svn-prov}{Invalid SVN Id line found! File name might be
-    '#2' or '\expandafter\@tempa\meaning\@filef@und'. This occured}{}{}{}%
+    '#2' or '\expandafter\strip@prefix\meaning\@filef@und'. This occured}{}{}{}%
     \endgroup
     \svnprov@gobbleopt
   }%
@@ -510,8 +509,8 @@
     \ifx\relax#8\empty
       \def\svnprov@svnfilename{#2}%
       \svnprov@splitfilename{#2}%
-      \def\svnprov@filerev{#3}%
-      \def\svnprov@filedate{#4/#5/#6}%
+      \def\svnprov@filerev@{#3}%
+      \def\svnprov@filedate@{#4/#5/#6}%
       \def\next{\begingroup\svnprov@catcodes\svnprov@buildstring}%
     \fi
   \fi
@@ -532,7 +531,7 @@
 %    \begin{macrocode}
 \def\svnprov@splitfilename#1{%
   \edef\g@tempa{#1}%
-  \let\svnprov@filebase\@gobble
+  \let\svnprov@filebase@\@gobble
   \expandafter
   \svnprov@splitfilename@\g@tempa.\relax
 }
@@ -553,15 +552,15 @@
 % \begin{macrocode}
 \def\svnprov@splitfilename@#1.#2\relax{%
   \if&#2&
-    \ifx\svnprov@filebase\@gobble
-      \gdef\svnprov@filebase{#1}%
-      \gdef\svnprov@fileext{}%
+    \ifx\svnprov@filebase@\@gobble
+      \gdef\svnprov@filebase@{#1}%
+      \gdef\svnprov@fileext@{}%
     \else
-      \gdef\svnprov@fileext{#1}%
+      \gdef\svnprov@fileext@{#1}%
     \fi
     \let\next\relax
   \else
-    \xdef\svnprov@filebase{\svnprov@filebase.#1}%
+    \xdef\svnprov@filebase@{\svnprov@filebase.#1}%
     \def\next{\svnprov@splitfilename@#2\relax}%
   \fi
   \next
@@ -596,7 +595,7 @@
 % prepended later.
 %    \begin{macrocode}
 \def\svnprov@defaultdesc{%
-  (SVN Rev:\space\svnprov@filerev)%
+  (SVN Rev:\space\svnprov@filerev@)%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -607,14 +606,19 @@
 % filename and information.
 %    \begin{macrocode}
 \newcommand*\svnprov@buildstring[1][\svnprov@defaultdesc]{%
+  \@ifnextchar{[}%
+    {\svnprov@buildstring@{#1}}%
+    {\svnprov@buildstring@{#1}[\relax]}%
+}
+\def\svnprov@buildstring@#1[#2]{%
   \endgroup
   \begingroup
-    \let\rev\svnprov@filerev
-    \let\filerev\svnprov@filerev
+    \let\rev\svnprov@filerev@
+    \let\filerev\svnprov@filerev@
     \def\Rev{\rev\space}%
     \let\revinfo\svnprov@defaultdesc
-    \let\filebase\svnprov@filebase
-    \let\fileext\svnprov@fileext
+    \let\filebase\svnprov@filebase@
+    \let\fileext\svnprov@fileext@
     \ifx\fileversion\@undefined
       \def\fileversion{v0.0}%
     \fi
@@ -624,9 +628,9 @@
       \svnprov@splitfilename{\svnprov@filename}%
     \fi
     \let\filename\svnprov@filename
-    \xdef\svnprov@fileinfo{#1}%
+    \xdef\svnprov@fileinfo@{#1}%
   \endgroup
-  \svnprov@ltxprov{\svnprov@filemask}[\svnprov@filedate\space\svnprov@fileinfo]%
+  \svnprov@ltxprov{\svnprov@filemask}[\svnprov@filedate@\space\svnprov@fileinfo@]%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -641,14 +645,14 @@
 %    \begin{macrocode}
 \def\GetFileInfoSVN#1{%
   \ifx*#1\relax
-    \let\filebase\svnprov@filebase
-    \let\fileext\svnprov@fileext
+    \let\filebase\svnprov@filebase@
+    \let\fileext\svnprov@fileext@
     \let\filename\svnprov@filename
-    \let\filedate\svnprov@filedate
-    \let\filerev\svnprov@filerev
-    \svnprov@getversion\svnprov@fileinfo
-    \let\fileversion\svnprov@fileversion
-    \let\fileinfo\svnprov@fileinfoonly
+    \let\filedate\svnprov@filedate@
+    \let\filerev\svnprov@filerev@
+    \svnprov@getversion\svnprov@fileinfo@
+    \let\fileversion\svnprov@fileversion@
+    \let\fileinfo\svnprov@fileinfoonly@
   \else
 %    \end{macrocode}
 % Given argument could be filename or short name.
@@ -678,23 +682,23 @@
 % \changes{v3.}{2010/04/01}{Added file name `base' and 'ext'(ension).}
 %    \begin{macrocode}
 \newcommand*\DefineFileInfoSVN[1][\svnprov@filemask]{%
-  \svnprov@getversion\svnprov@fileinfo
+  \svnprov@getversion\svnprov@fileinfo@
   \expandafter
   \edef\csname\svnprov@filemask @short\endcsname{#1}%
   \expandafter
   \edef\csname#1@long\endcsname{\svnprov@filemask}%
   \expandafter
-  \let\csname#1@base\endcsname\svnprov@filebase
+  \let\csname#1@base\endcsname\svnprov@filebase@
   \expandafter
-  \let\csname#1@ext\endcsname\svnprov@fileext
+  \let\csname#1@ext\endcsname\svnprov@fileext@
   \expandafter
-  \let\csname#1@date\endcsname\svnprov@filedate
+  \let\csname#1@date\endcsname\svnprov@filedate@
   \expandafter
-  \let\csname#1@version\endcsname\svnprov@fileversion
+  \let\csname#1@version\endcsname\svnprov@fileversion@
   \expandafter
-  \let\csname#1@rev\endcsname\svnprov@filerev
+  \let\csname#1@rev\endcsname\svnprov@filerev@
   \expandafter
-  \let\csname#1@info\endcsname\svnprov@fileinfoonly
+  \let\csname#1@info\endcsname\svnprov@fileinfoonly@
 }
 %    \end{macrocode}
 % \end{macro}
@@ -718,16 +722,16 @@
     {\svnprov@getversion@@}%
 }
 \def\svnprov@getversion@#1 #2\svnprov@endmarker{%
-  \def\svnprov@fileversion{#1}%
+  \def\svnprov@fileversion@{#1}%
   \ifx&#2&%
-    \def\svnprov@fileinfoonly{}%
+    \def\svnprov@fileinfoonly@{}%
   \else
-    \edef\svnprov@fileinfoonly{\svnprov@zapspace#2\svnprov@endmarker}%
+    \edef\svnprov@fileinfoonly@{\svnprov@zapspace#2\svnprov@endmarker}%
   \fi
 }
 \def\svnprov@getversion@@#1 \svnprov@endmarker{%
-  \def\svnprov@fileversion{}%
-  \def\svnprov@fileinfoonly{#1}%
+  \def\svnprov@fileversion@{}%
+  \def\svnprov@fileinfoonly@{#1}%
 }
 \def\svnprov@zapspace#1 \svnprov@endmarker{#1}
 %    \end{macrocode}

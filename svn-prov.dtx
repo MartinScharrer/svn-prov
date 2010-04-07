@@ -41,6 +41,8 @@
 \usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{booktabs}
 \usepackage{ydoc-desc}
+\usepackage[english]{babel}
+\dateenglish
 
 \makeatletter
 %%% Examples %%%
@@ -107,7 +109,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{398}
+% \CheckSum{429}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -142,7 +144,7 @@
 % class and file header}
 % \author{Martin Scharrer \\ \url{martin@scharrer-online.de}}
 % \GetFileInfoSVN{svnprov}
-% \date{Version~\fileversion\ - \filedate}
+% \date{Version~\fileversion\ - \filetoday}
 %
 % \maketitle
 %
@@ -228,20 +230,26 @@
 % \par\medskip
 % \DescribeMacro\GetFileInfoSVN{<name>}
 % \DescribeMacro\GetFileInfoSVN*
-% This macro sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{fileversion}, \cs{filerev} and \cs{fileinfo} to
-% the corresponding values of the file given by \meta{name}. The file must have been read/loaded before and use
-% both a \cs{Provides\ldots SVN} macro and \cs{DefineFileInfoSVN}, otherwise the above macros will be set to |\relax|.
-% The \meta{name} can be either the real filename or the optional short name used with \cs{DefineFileInfoSVN}.
+% This macro sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{fileversion}, \cs{filerev},
+% \cs{fileinfo} and \cs{filetoday} to the corresponding values of the file given by \meta{name}. The file must have been
+% read/loaded before and use both a \cs{Provides\ldots SVN} macro and \cs{DefineFileInfoSVN}, otherwise the above macros
+% will be set to |\relax|.  The \meta{name} can be either the real filename or the optional short name used with
+% \cs{DefineFileInfoSVN}.
 %
-% The star version of this macro provides the file information of the last file which called one of the \cs{Provides\ldots SVN} macros.
+% The star version of this macro provides the file information of the last file which called one of the
+% \cs{Provides\ldots SVN} macros.
 %
-% The macros \cs{fileversion} and \cs{fileinfo} hold the file version and description taken from optional argument of the \cs{Provide...SVN} macro.
-% The version is defined only if this argument starts with `|v|' and is otherwise empty. It includes all text up to the first space.
+% The macros \cs{fileversion} and \cs{fileinfo} hold the file version and description taken from optional argument of
+% the \cs{Provide...SVN} macro.  The version is defined only if this argument starts with `|v|' and is otherwise empty.
+% It includes all text up to the first space.
+% The \cs{filetoday} macro generates a text representation of the \cs{filedate} using the \cs{today} macro. This macro
+% must be first defined by the |\date|\meta{lang} macro from the \pkg{babel} package, otherwise \cs{filetoday} will not
+% be defined.
 % The other macros are described above.
 %
 %
 % \par\medskip
-% \DescribeMacro\DefineFileInfoSVN[name]
+% \DescribeMacro\DefineFileInfoSVN[<name>]
 % Defined\marginpar{\it New in v1. 2009/05/03}
 % a set of macros which provide the information collected by a previous 
 % \cs{Provides\ldots} macro. The macros have the form 
@@ -673,6 +681,7 @@
     \let\filerev\svnprov@filerev@
     \let\fileversion\svnprov@fileversion@
     \let\fileinfo\svnprov@filedesc@
+    \expandafter\svnprov@settoday@\svnprov@filedate@\relax
   \else
 %    \end{macrocode}
 % Given argument could be filename or short name.
@@ -692,6 +701,23 @@
     \expandafter\let\expandafter\filerev \csname\@gtempa @rev\endcsname
     \expandafter\let\expandafter\fileversion\csname\@gtempa @version\endcsname
     \expandafter\let\expandafter\fileinfo\csname\@gtempa @info\endcsname
+    \expandafter\expandafter\expandafter\svnprov@settoday@\csname\@gtempa @date\endcsname\relax
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@settoday@}
+% Sets \cs{filetoday} by expanding \cs{today} after setting the year/month/day locally.
+%    \begin{macrocode}
+\def\svnprov@settoday@#1/#2/#3\relax{%
+  \ifx\today\@undefined\else
+  \begingroup
+    \year#1\relax
+    \month#2\relax
+    \day#3\relax
+    \xdef\filetoday{\today}%
+  \endgroup
   \fi
 }
 %    \end{macrocode}

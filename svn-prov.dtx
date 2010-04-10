@@ -37,10 +37,10 @@
 % Re-require package to check date
 \RequirePackage{svn-prov}[\filedate]
 
-\documentclass{ltxdoc}
+\documentclass{article}
+\usepackage{ydoc}
 \usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{booktabs}
-\usepackage{ydoc-desc}
 \usepackage[english]{babel}
 \dateenglish
 
@@ -49,12 +49,10 @@
 \RequirePackage{fancyvrb}
 \RequirePackage{listings}
 
-\newenvironment{example}
+\renewenvironment{example}
   {\begingroup\VerbatimOut[gobble=4]{\jobname.exa}}
   {\endVerbatimOut\endgroup\formatexample}
 
-\newsavebox{\examplecodebox}
-\newsavebox{\exampleresultbox}
 \usepackage{ifthen,calc}
 
 \def\examplebeforetext{The following code:}

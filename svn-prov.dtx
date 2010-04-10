@@ -109,7 +109,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{429}
+% \CheckSum{435}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -701,7 +701,9 @@
     \expandafter\let\expandafter\filerev \csname\@gtempa @rev\endcsname
     \expandafter\let\expandafter\fileversion\csname\@gtempa @version\endcsname
     \expandafter\let\expandafter\fileinfo\csname\@gtempa @info\endcsname
-    \expandafter\expandafter\expandafter\svnprov@settoday@\csname\@gtempa @date\endcsname\relax
+    \@ifundefined{\@gtempa @date}%
+      {\def\filetoday{?}}%
+      {\expandafter\expandafter\expandafter\svnprov@settoday@\csname\@gtempa @date\endcsname\relax}%
   \fi
 }
 %    \end{macrocode}
@@ -711,7 +713,9 @@
 % Sets \cs{filetoday} by expanding \cs{today} after setting the year/month/day locally.
 %    \begin{macrocode}
 \def\svnprov@settoday@#1/#2/#3\relax{%
-  \ifx\today\@undefined\else
+  \ifx\today\@undefined
+    \def\filetoday{?}%
+  \else
   \begingroup
     \year#1\relax
     \month#2\relax

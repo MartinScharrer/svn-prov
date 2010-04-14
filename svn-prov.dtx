@@ -166,18 +166,19 @@
 % ^^A\subsection{Subversion Id Keyword}
 % The following macros need an Id keyword which can initially be written as 
 % `|$||Id:$|' and will be expanded by Subversion into the following format at 
-% the next commit:\\[\smallskipamount]
+% the next commit:\par\smallskip
 % \texttt{\frenchspacing\${}Id: \meta{filename} \meta{revision} \meta{date} 
-% \meta{time} \meta{author} \$}\\[\smallskipamount]
-% e.g. for the source file of this document:\\*[\smallskipamount]
+% \meta{time} \meta{author} \$}
+% \par\smallskip
+% \noindent e.g. for the source file of this document:\par\smallskip
 % |$Id$|
 % \par\smallskip
-% For this to work the Subversion \emph{property} \texttt{svn:keywords} must be 
+% \noindent For this to work the Subversion \emph{property} \texttt{svn:keywords} must be 
 % set to (at least) `|Id|' for the source file(s). e.g.\ using the command 
-% line:\\[\smallskipamount]
+% line:\par\smallskip
 % \texttt{svn propset 'svn:keyword' 'Id' \meta{filename(s)}}
-% \par\smallskip
-% \nopagebreak[3]
+% \par\smallskip\noindent
+% \nopagebreak[3]\unskip
 % More information about using Subversion in the \LaTeX\ workflow can be found in the 
 % Prac\TeX{} Journal issue 2007-3\footnote
 % {URL: 
@@ -226,7 +227,8 @@
 % \par\medskip
 % \DescribeMacro\GetFileInfoSVN{<name>}
 % \DescribeMacro\GetFileInfoSVN*
-% This macro sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{fileversion}, \cs{filerev},
+% This macro\marginpar{\it\raggedright Non-star version added in v3. 2010/04/11}
+% sets the macros \cs{filebase}, \cs{fileext}, \cs{filename}, \cs{filedate}, \cs{fileversion}, \cs{filerev},
 % \cs{fileinfo} and \cs{filetoday} to the corresponding values of the file given by \meta{name}. The file must have been
 % read/loaded before and use both a \cs{Provides\ldots SVN} macro and \cs{DefineFileInfoSVN}, otherwise the above macros
 % will be set to |\relax|.  The \meta{name} can be either the real filename or the optional short name used with
@@ -245,7 +247,7 @@
 %
 % \par\medskip
 % \DescribeMacro\DefineFileInfoSVN[<name>]
-% Defined\marginpar{\it New in v1. 2009/05/03}
+% Defined\marginpar{\it\raggedright New in v1. 2009/05/03}
 % a set of macros which provide the information collected by a previous 
 % \cs{Provides\ldots} macro. The macros have the form 
 % |\|\meta{name}|@|\meta{data} where \meta{name} is by default the filename 
@@ -253,11 +255,12 @@
 % classes). This default can be overwritten by the optional argument.
 % The \meta{data} stands for |version|, |rev| (revision), |date| and |info|
 % (the information part without the version number)
-% and, since v3, file name |base| and |ext|(ension).
+% and, since v3,\marginpar{\it\raggedright Updated in v3. 2010/04/11}
+% file name |base| and |ext|(ension).
 %
 % \noindent
 % \textit{Example:} Applied to the |.dtx| file of this very package the 
-% following macros are defined:\par
+% following macros are defined:\par\medskip
 % \begingroup
 % \makeatletter\centering
 % \begin{tabular}{ll}
@@ -272,7 +275,7 @@
 %  \cs{svn-prov.dtx@ext}     & \@nameuse{svn-prov.dtx@ext}     \\
 %  \bottomrule
 % \end{tabular}
-% \\[\medskipamount]
+% \par\bigskip
 % The style file however would get macros like \cs{svn-prov@version}.
 % Because `|-|' is not a letter the macros can only be accessed using |\csname|.  
 % Therefore the optional argument |[svnprov]| is used to name the macros
@@ -706,6 +709,7 @@
 %
 % \begin{macro}{\svnprov@settoday@}
 % Sets \cs{filetoday} by expanding \cs{today} after setting the year/month/day locally.
+% \changes{v3.}{2010/04/14}{Changed to dynamically call \cs{today} and not use \cs{edef}, because \cs{today} might not defined (yet).}
 %    \begin{macrocode}
 \def\svnprov@settoday@#1/#2/#3\relax{%
   \def\filetoday{{%

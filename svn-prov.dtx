@@ -105,7 +105,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{435}
+% \CheckSum{424}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -708,12 +708,10 @@
 % Sets \cs{filetoday} by expanding \cs{today} after setting the year/month/day locally.
 %    \begin{macrocode}
 \def\svnprov@settoday@#1/#2/#3\relax{%
-  \begingroup
-    \year#1\relax
-    \month#2\relax
-    \day#3\relax
-    \xdef\filetoday{\today}%
-  \endgroup
+  \def\filetoday{{%
+    \year#1\month#2\day#3\relax
+    \today
+  }}%
 }
 %    \end{macrocode}
 % \end{macro}

@@ -41,8 +41,6 @@
 \usepackage{ydoc}
 \usepackage[hyperfootnotes=false]{hyperref}
 \usepackage{booktabs}
-\usepackage[english]{babel}
-\dateenglish
 
 \makeatletter
 %%% Examples %%%
@@ -240,9 +238,8 @@
 % The macros \cs{fileversion} and \cs{fileinfo} hold the file version and description taken from optional argument of
 % the \cs{Provide...SVN} macro.  The version is defined only if this argument starts with `|v|' and is otherwise empty.
 % It includes all text up to the first space.
-% The \cs{filetoday} macro generates a text representation of the \cs{filedate} using the \cs{today} macro. This macro
-% must be first defined by the |\date|\meta{lang} macro from the \pkg{babel} package, otherwise \cs{filetoday} will not
-% be defined.
+% The \cs{filetoday} macro generates a text representation of the \cs{filedate} using the \cs{today} macro. The format can be
+% adjusted to a different language with the |\date|\meta{language} macro from the \pkg{babel} package.
 % The other macros are described above.
 %
 %

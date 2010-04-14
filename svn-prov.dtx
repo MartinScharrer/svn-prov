@@ -708,16 +708,12 @@
 % Sets \cs{filetoday} by expanding \cs{today} after setting the year/month/day locally.
 %    \begin{macrocode}
 \def\svnprov@settoday@#1/#2/#3\relax{%
-  \ifx\today\@undefined
-    \def\filetoday{?}%
-  \else
   \begingroup
     \year#1\relax
     \month#2\relax
     \day#3\relax
     \xdef\filetoday{\today}%
   \endgroup
-  \fi
 }
 %    \end{macrocode}
 % \end{macro}

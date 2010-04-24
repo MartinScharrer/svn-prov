@@ -105,7 +105,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{424}
+% \CheckSum{423}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -255,8 +255,9 @@
 % classes). This default can be overwritten by the optional argument.
 % The \meta{data} stands for |version|, |rev| (revision), |date| and |info|
 % (the information part without the version number)
-% and, since v3,\marginpar{\it\raggedright Updated in v3. 2010/04/11}
-% file name |base| and |ext|(ension).
+% and, since v3,\marginpar{\it\raggedright Updated in v3. 2010/04/24}
+% file name |base| and |ext|(ension) as well as |today|, which prints
+% the |date| in the format of \cs{today}.
 %
 % \noindent
 % \textit{Example:} Applied to the |.dtx| file of this very package the 
@@ -273,6 +274,7 @@
 %  \cs{svn-prov.dtx@info}    & \@nameuse{svn-prov.dtx@info}    \\
 %  \cs{svn-prov.dtx@base}    & \@nameuse{svn-prov.dtx@base}    \\
 %  \cs{svn-prov.dtx@ext}     & \@nameuse{svn-prov.dtx@ext}     \\
+%  \cs{svn-prov.dtx@today}   & \@nameuse{svn-prov.dtx@today}   \\
 %  \bottomrule
 % \end{tabular}
 % \par\bigskip
@@ -523,6 +525,7 @@
       \svnprov@splitfilename{#2}%
       \def\svnprov@filerev@{#3}%
       \def\svnprov@filedate@{#4/#5/#6}%
+      \def\svnprov@filetoday@{\svnprov@@today{#4}{#5}{#6}}%
       \def\next{\begingroup\svnprov@catcodes\svnprov@buildstring}%
     \fi
   \fi
@@ -535,6 +538,15 @@
 %    \begin{macrocode}
 \endgroup
 %    \end{macrocode}
+%
+% \begin{macro}{\svnprov@@today}
+% Prints \cs{today} with the given date.
+%    \begin{macrocode}
+\def\svnprov@@today#1#2#3{%
+  {\year#1\month#2\day#3\relax\today}%
+}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\svnprov@splitfilename}
 % Expands the argument and initialises the file base macro before it calls the 
@@ -679,7 +691,7 @@
     \let\filerev\svnprov@filerev@
     \let\fileversion\svnprov@fileversion@
     \let\fileinfo\svnprov@filedesc@
-    \expandafter\svnprov@settoday@\svnprov@filedate@\relax
+    \let\filetoday\svnprov@filetoday@
   \else
 %    \end{macrocode}
 % Given argument could be filename or short name.
@@ -699,23 +711,8 @@
     \expandafter\let\expandafter\filerev \csname\@gtempa @rev\endcsname
     \expandafter\let\expandafter\fileversion\csname\@gtempa @version\endcsname
     \expandafter\let\expandafter\fileinfo\csname\@gtempa @info\endcsname
-    \@ifundefined{\@gtempa @date}%
-      {\def\filetoday{?}}%
-      {\expandafter\expandafter\expandafter\svnprov@settoday@\csname\@gtempa @date\endcsname\relax}%
+    \expandafter\let\expandafter\filetoday\csname\@gtempa @today\endcsname
   \fi
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\svnprov@settoday@}
-% Sets \cs{filetoday} by expanding \cs{today} after setting the year/month/day locally.
-% \changes{v3.}{2010/04/14}{Changed to dynamically call \cs{today} and not use \cs{edef}, because \cs{today} might not defined (yet).}
-%    \begin{macrocode}
-\def\svnprov@settoday@#1/#2/#3\relax{%
-  \def\filetoday{{%
-    \year#1\month#2\day#3\relax
-    \today
-  }}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -741,6 +738,8 @@
   \let\csname#1@rev\endcsname\svnprov@filerev@
   \expandafter
   \let\csname#1@info\endcsname\svnprov@filedesc@
+  \expandafter
+  \let\csname#1@today\endcsname\svnprov@filetoday@
 }
 %    \end{macrocode}
 % \end{macro}

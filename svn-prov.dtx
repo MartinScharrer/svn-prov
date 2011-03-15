@@ -37,11 +37,12 @@
 % Re-require package to check date
 \RequirePackage{svn-prov}[\filedate]
 
-\documentclass{article}
-\usepackage{ydoc}
-\usepackage[hyperfootnotes=false]{hyperref}
+%\tracingall\tracingonline=0
+\listfiles
+\documentclass{ydoc}
+\hypersetup{hyperfootnotes=false}
 \usepackage{booktabs}
-
+\listfiles
 \makeatletter
 %%% Examples %%%
 \RequirePackage{fancyvrb}
@@ -66,9 +67,9 @@
 }
 
 \lstset{%
-  %numbers=left,
+  numbers=none,
   numberstyle=\scriptsize\sffamily,
-  basicstyle=\ttfamily,
+  basicstyle=\ttfamily\small,
   stepnumber=1,
   language=[latex]tex,
 }%
@@ -164,6 +165,8 @@
 %
 % \section{Usage}
 % ^^A\subsection{Subversion Id Keyword}
+% \colorlet{oldmeta}{meta}
+% \colorlet{meta}{black}
 % The following macros need an Id keyword which can initially be written as 
 % `|$||Id:$|' and will be expanded by Subversion into the following format at 
 % the next commit:\par\smallskip
@@ -182,13 +185,13 @@
 % More information about using Subversion in the \LaTeX\ workflow can be found in the 
 % Prac\TeX{} Journal issue 2007-3\footnote
 % {URL: 
-% \ttfamily\url{http://www.tug.org/pracjourn/2007-3/}\char`\{\href
+% \UrlFont\url{http://www.tug.org/pracjourn/2007-3/}\char`\{\href
 % {http://www.tug.org/pracjourn/2007-3/skiadas-svn}{skiadas-svn}\char`\|\href
 % {http://www.tug.org/pracjourn/2007-3/ziegenhagen}{ziegenhagen}\char`\|\href
 % {http://www.tug.org/pracjourn/2007-3/scharrer}{scharrer}\char`\}}.
+% \colorlet{meta}{oldmeta}
 %
 % ^^A\subsection{Main Macros}
-% \manualnewpage%%
 % \DescribeMacro\ProvidesPackageSVN [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
 % \DescribeMacro\ProvidesClassSVN   [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
 % \DescribeMacro\ProvidesFileSVN    [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]

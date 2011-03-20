@@ -39,7 +39,7 @@
 
 %\tracingall\tracingonline=0
 \listfiles
-\documentclass{ydoc}
+\documentclass{ydoc}[2011/03/19]
 \hypersetup{hyperfootnotes=false}
 \usepackage{booktabs}
 \listfiles
@@ -94,6 +94,7 @@
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
+\normalmarginpar
 
 \let\manualnewpage\newpage
 \listfiles
@@ -137,13 +138,14 @@
 % \DoNotIndex{\@ifnextchar,\@gobble,\@undefined,\begingroup,\endgroup,\empty}
 % \DoNotIndex{\expandafter,\NeedsTeXFormat}
 %
-% \title{The \textsf{svn-prov} package\\\large Use SVN Id keywords for package, 
-% class and file header}
-% \author{Martin Scharrer \\ \url{martin@scharrer-online.de}}
 % \GetFileInfoSVN{svnprov}
-% \date{Version~\fileversion\ - \filetoday}
-%
+% \author{Martin Scharrer}
+% \email{martin@scharrer-online.de}
 % \maketitle
+%
+% \begin{abstract}
+% Use SVN Id keywords to set package, class and file headers.
+% \end{abstract}
 %
 % \section{Introduction}
 % This package is directed to authors of \LaTeX\ packages and classes which use 
@@ -169,19 +171,14 @@
 % \colorlet{meta}{black}
 % The following macros need an Id keyword which can initially be written as 
 % `|$||Id:$|' and will be expanded by Subversion into the following format at 
-% the next commit:\par\smallskip
-% \texttt{\frenchspacing\${}Id: \meta{filename} \meta{revision} \meta{date} 
-% \meta{time} \meta{author} \$}
-% \par\smallskip
-% \noindent e.g. for the source file of this document:\par\smallskip
-% |$Id$|
-% \par\smallskip
-% \noindent For this to work the Subversion \emph{property} \texttt{svn:keywords} must be 
-% set to (at least) `|Id|' for the source file(s). e.g.\ using the command 
-% line:\par\smallskip
-% \texttt{svn propset 'svn:keywords' 'Id' \meta{filename(s)}}
-% \par\smallskip\noindent
-% \nopagebreak[3]\unskip
+% the next commit:
+% \codeline[i]{'$Id:'~<filename>~<revision>~<date>~<time>~<author>~'$'}
+% e.g.\ for the source file of this document:\par\smallskip
+% \codeline[i]{'$Id$'}
+% For this to work the Subversion \emph{property} \texttt{svn:keywords} must be 
+% set to (at least) "Id" for the source file(s), e.g.\ using the command 
+% line:
+% \codeline[i]{'svn propset ''''svn:keywords'''' ''''Id'''~<filename(s)>}
 % More information about using Subversion in the \LaTeX\ workflow can be found in the 
 % Prac\TeX{} Journal issue 2007-3\footnote
 % {URL: 
@@ -192,9 +189,9 @@
 % \colorlet{meta}{oldmeta}
 %
 % ^^A\subsection{Main Macros}
-% \DescribeMacro\ProvidesPackageSVN [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
-% \DescribeMacro\ProvidesClassSVN   [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
-% \DescribeMacro\ProvidesFileSVN    [<file name>] {\$Id:~\$} [<\small version and/or description>] [<\small description>]
+% \DescribeMacro\ProvidesPackageSVN [<file name>] {'$Id$'} [<\small version and/or description>] [<\small description>]
+% \DescribeMacro\ProvidesClassSVN   [<file name>] {'$Id$'} [<\small version and/or description>] [<\small description>]
+% \DescribeMacro\ProvidesFileSVN    [<file name>] {'$Id$'} [<\small version and/or description>] [<\small description>]
 %
 % All of these macros await a valid Subversion Id keyword string as a mandatory 
 % argument. The file name and date is extracted from this string. For cases when 
@@ -218,7 +215,7 @@
 %   \item[\cs{rev}] File revision.
 %   \item[\cs{Rev}] File revision followed by a space.
 %   \item[\cs{revinfo}] The default information used: 
-%   ``\texttt{\frenchspacing(SVN Rev: \meta{revision})}''.
+%   ``\MacroArgs'SVN Rev: '<revision>\relax''.
 %   \item[\cs{filebase}] File base name (file name without extension).
 %   \item[\cs{fileext}] File extension (without leading dot).
 %   \item[\cs{filename}] File name.

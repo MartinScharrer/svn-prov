@@ -1,144 +1,75 @@
-# $Id$
+CONTRIBUTION  = svn-prov
+NAME          = Martin Scharrer
+EMAIL         = martin@scharrer-online.de
+DIRECTORY     = /macros/latex/contrib/${CONTRIBUTION}
+LICENSE       = free
+FREEVERSION   = lppl
+FILE          = ${CONTRIBUTION}.tar.gz
+export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION FILE
 
-PACKAGE     = svn-prov
-PACKAGE_STY = ${PACKAGE}.sty
-PACKAGE_DTX = ${PACKAGE}.dtx
-PACKAGE_SCR =
-PACKAGE_DOC = $(PACKAGE_DTX:.dtx=.pdf)
-PACKAGE_SRC = ${PACKAGE_DTX} ${PACKAGE}.ins Makefile
-PACKFILES   = ${PACKAGE_SRC} ${PACKAGE_DOC} README
 
-TEXAUX = *.aux *.log *.glo *.ind *.idx *.out *.svn *.svx *.svt *.toc *.ilg *.gls *.hd *.fdb_latexmk
-INSGENERATED = ${PACKAGE_STY}
-GENERATED = ${INSGENERATED} ${PACKAGE}.pdf ${PACKAGE}.zip ${PACKAGE}.tar.gz ${TESTDIR}/test*.pdf
-ZIPFILE = ${PACKAGE}-${ZIPVERSION}.zip
-TDSZIPFILE = ${PACKAGE}-${ZIPVERSION}.tds.zip
+SRCFILES = ${CONTRIBUTION}.sty
+DOCFILES = ${CONTRIBUTION}.pdf README
 
-TESTDIR = tests
-TESTS = $(patsubst %.tex,%,$(subst ${TESTDIR}/,,$(wildcard ${TESTDIR}/test?.tex ${TESTDIR}/test??.tex))) # look for all test*.tex file names and remove the '.tex' 
-TESTARGS = -output-directory ${TESTDIR}
+TEXMF = ${HOME}/texmf
 
-LATEX_OPTIONS = -interaction=batchmode
-LATEX = pdflatex ${LATEX_OPTIONS}
+LATEXMK = latexmk -pdf
 
-TEXMFDIR = ${HOME}/texmf
+.PHONY: all upload doc clean install uninstall build
 
-RED   = \033[01;31m
-GREEN = \033[01;32m
-WHITE = \033[00m
+all: doc
 
-CP = cp -v
-MV = mv -v
-RMDIR = rm -rf
-MKDIR = mkdir -p
+${FILE}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.sty README ${CONTRIBUTION}.pdf
+	${MAKE} --no-print-directory build
 
-.PHONY: all doc package clean fullclean example testclean ${TESTS} tds ${CHECK_LOG}
+upload: ${FILE}
+	ctanupload -p
 
-###############################################################################
+doc: ${CONTRIBUTION}.pdf
 
-all: package doc example
-new: fullclean all
+${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty ${CONTRIBUTION}.ins
+	${MAKE} --no-print-directory build
 
-doc: ${PACKAGE_DOC} pdfopt
+BUILDDIR = build
 
-package: ${PACKAGE_STY} ${PACKAGE_SCR}
-
-%.pdf: %.dtx
-	${LATEX} $*.dtx
-	-makeindex -s gind.ist -o $*.ind $*.idx
-	-makeindex -s gglo.ist -o $*.gls $*.glo
-	${LATEX} $*.dtx
-	${LATEX} $*.dtx
-
-${PACKAGE}.pdf: ${PACKAGE}.sty
-
-${INSGENERATED}: ${PACKAGE_DTX} ${PACKAGE}.ins 
-	yes | latex ${PACKAGE}.ins
+build:
+	-mkdir ${BUILDDIR} 2>/dev/null || true
+	cp ${CONTRIBUTION}.ins README ${BUILDDIR}/
+	tex '\input ydocincl\relax\includefiles{${CONTRIBUTION}.dtx}{${BUILDDIR}/${CONTRIBUTION}.dtx}' && ${RM} ydocincl.log
+	cd ${BUILDDIR} && tex ${CONTRIBUTION}.ins
+	cd ${BUILDDIR} && ${LATEXMK} ${CONTRIBUTION}.dtx
+	cd ${BUILDDIR} && ctanify ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.sty README ${CONTRIBUTION}.pdf
+	cd ${BUILDDIR} && cp ${CONTRIBUTION}.tar.gz ${CONTRIBUTION}.pdf ..
 
 clean:
-	rm -f ${TEXAUX} $(addprefix ${TESTDIR}/, ${TEXAUX})
-
-fullclean: clean
-	rm -f ${GENERATED} *~ *.backup
-	rm -f ${PACKAGE}*.zip
-	rm -rf tds/
+	latexmk -C ${CONTRIBUTION}.dtx
+	@${RM} ${CONTRIBUTION}.cod ${CONTRIBUTION}.glo ${CONTRIBUTION}.gls ${CONTRIBUTION}.exa ${CONTRIBUTION}.log ${CONTRIBUTION}.aux
+	${RM} -r build ${FILE}
 
 
-zip: ${PACKFILES}
-	@${MAKE} --no-print-directory ${ZIPFILE}
+distclean:
+	latexmk -c ${CONTRIBUTION}.dtx
+	@${RM} ${CONTRIBUTION}.cod ${CONTRIBUTION}.glo ${CONTRIBUTION}.gls ${CONTRIBUTION}.exa ${CONTRIBUTION}.log ${CONTRIBUTION}.aux
+	${RM} -r build
 
-zip: ZIPVERSION=$(shell grep "Package: ${PACKAGE} " ${PACKAGE}.log | \
-	sed -e "s/.*Package: ${PACKAGE} ....\/..\/..\s\+\(v\S\+\).*/\1/")
 
-tdszip: ZIPVERSION=$(shell grep "Package: ${PACKAGE} " ${PACKAGE}.log | \
-	sed -e "s/.*Package: ${PACKAGE} ....\/..\/..\s\+\(v\S\+\).*/\1/")
+install: ${CONTRIBUTION}.pdf ${CONTRIBUTION}.sty
+	-@mkdir ${TEXMF}/tex/latex/${CONTRIBUTION}/ 2>/dev/null || true
+	-@mkdir ${TEXMF}/doc/latex/${CONTRIBUTION}/ 2>/dev/null || true
+	cp ${SRCFILES} ${TEXMF}/tex/latex/${CONTRIBUTION}/
+	cp ${DOCFILES} ${TEXMF}/doc/latex/${CONTRIBUTION}/
+	test -f ${TEXMF}/ls-R && texhash ${TEXMF}
 
-${PACKAGE}%.zip: ${PACKFILES}
-	@test -n "${IGNORE_CHECKSUM}" || grep -L '\* Checksum passed \*' ${PACKAGE_DTX:.dtx=.log} | wc -l | grep -q '^0$$'
-	${RM} $@
-	zip $@ ${PACKFILES}
-	@echo
-	@echo "ZIP file $@ created!"
 
-release: fullclean package doc example tests zip
+installsymlinks:
+	-@mkdir ${TEXMF}/tex/latex/${CONTRIBUTION}/ 2>/dev/null || true
+	-cd ${TEXMF}/tex/latex/${CONTRIBUTION}/ && ${RM} ${SRCFILES}
+	ln -s ${SRCFILES} ${TEXMF}/tex/latex/${CONTRIBUTION}/
+	test -f ${TEXMF}/ls-R && texhash ${TEXMF}
 
-pdfopt:	.${PACKAGE}.opt
-.${PACKAGE}.opt: ${PACKAGE}.pdf
-	-pdfopt "$<" "$@" && cp "$@" "$<" && touch --reference="$<" "$@"
-
-###############################################################################
-
-# Make sure TeX finds the input files in TESTDIR
-tests ${TESTS}: export TEXINPUTS:=${TEXINPUTS}:${TESTDIR}
-tests ${TESTS}: LATEX_OPTIONS=
-
-testclean:
-	@${RM} $(foreach ext, aux log out pdf svn svx, tests/test*.${ext})
-
-tests: package testclean
-	@echo "Running tests: ${TESTS}:"
-	@${MAKE} -e -i --no-print-directory ${TESTS} \
-		TESTARGS="-interaction=batchmode -output-directory=${TESTDIR}"\
-		TESTPLOPT="-q"\
-		> /dev/null
-
-${TESTS}: % : ${TESTDIR}/%.tex package testclean
-	@-${LATEX} -interaction=nonstopmode ${TESTARGS} $< 1>/dev/null 2>/dev/null
-	@if (${LATEX} ${TESTARGS} $< && (test ! -e ${TESTDIR}/$*.pl || ${TESTDIR}/$*.pl ${TESTPLOPT})); \
-		then /bin/echo -e "${GREEN}$@ succeeded${WHITE}" >&2; \
-		else /bin/echo -e "${RED}$@ failed!!!!!!${WHITE}" >&2; fi
-
-###############################################################################
-
-tds: .tds
-
-.tds: ${PACKAGE_STY} ${PACKAGE_DOC} ${PACKAGE_SRC}
-	@grep -q '\* Checksum passed \*' ${PACKAGE}.log
-	${RMDIR} tds
-	${MKDIR} tds/
-	${MKDIR} tds/tex/ tds/tex/latex/ tds/tex/latex/${PACKAGE}/
-	${MKDIR} tds/doc/ tds/doc/latex/ tds/doc/latex/${PACKAGE}/
-	${MKDIR} tds/source/ tds/source/latex/ tds/source/latex/${PACKAGE}/
-	-test -n "${PACKAGE_SCR}" && ${MKDIR} tds/scripts/ tds/scripts/${PACKAGE}/
-	${CP} ${PACKAGE_STY} tds/tex/latex/${PACKAGE}/
-	${CP} ${PACKAGE_DOC} tds/doc/latex/${PACKAGE}/
-	-${CP} ${PACKAGE_SRC} tds/source/latex/${PACKAGE}/
-	-test -n "${PACKAGE_SCR}" && ${CP} ${PACKAGE_SCR} tds/scripts/${PACKAGE}/
-	@touch $@
-
-tdszip: ${TDSZIPFILE}
-
-${TDSZIPFILE}: .tds
-	${RM} ${TDSZIPFILE}
-	cd tds && zip -r ../${TDSZIPFILE} .
-
-###############################################################################
-
-install: .tds
-	test -d "${TEXMFDIR}" && ${CP} -a tds/* "${TEXMFDIR}/" && texhash ${TEXMFDIR}
 
 uninstall:
-	test -d "${TEXMFDIR}" && ${RM} -rv "${TEXMFDIR}/tex/latex/${PACKAGE}" \
-	"${TEXMFDIR}/doc/latex/${PACKAGE}" "${TEXMFDIR}/source/latex/${PACKAGE}" \
-	"${TEXMFDIR}/scripts/${PACKAGE}" && texhash ${TEXMFDIR}
+	${RM} ${TEXMF}/tex/latex/${CONTRIBUTION}/ ${TEXMF}/doc/latex/${CONTRIBUTION}/
+	test -f ${TEXMF}/ls-R && texhash ${TEXMF}
+
 

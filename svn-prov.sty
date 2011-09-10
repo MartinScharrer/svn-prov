@@ -1,0 +1,362 @@
+%    \begin{macrocode}
+\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%    \end{macrocode}
+%
+% \begin{macro}{\ProvidesClassSVN}
+% Calls the generic macro with the original LaTeX macro and the string to be 
+% used as filename.
+%    \begin{macrocode}
+\def\ProvidesClassSVN{%
+  \svnprov@generic\ProvidesClass{\svnprov@filebase@}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ProvidesFileSVN}
+% Calls the generic macro with the original LaTeX macro and the string to be 
+% used as filename.
+%    \begin{macrocode}
+\def\ProvidesFileSVN{%
+  \svnprov@generic\ProvidesFile{\svnprov@filebase@.\svnprov@fileext@}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ProvidesPackageSVN}
+% Calls the generic macro with the original LaTeX macro and the string to be 
+% used as filename.
+%    \begin{macrocode}
+\def\ProvidesPackageSVN{%
+  \svnprov@generic\ProvidesPackage{\svnprov@filebase@}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@generic}
+% Stores the arguments (1: original macro, 2: file mask (full filename if only 
+% base is used?)). Then tests if a explicit file name was given as optional 
+% argument.  If not the file name from the SVN Id string is used.
+%    \begin{macrocode}
+\def\svnprov@generic#1#2{%
+  \def\svnprov@ltxprov{#1}%
+  \def\svnprov@filemask{#2}%
+  \begingroup
+  \svnprov@catcodes
+  \@ifnextchar{[}%
+    {\svnprov@getid}%
+    {\svnprov@getid[\svnprov@svnfilename]}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@catcodes}
+% Sets the normal catcodes for all characters required by the |getid| macro.
+%    \begin{macrocode}
+\def\svnprov@catcodes{%
+  \catcode`\ =10%
+  \catcode`\$=3%
+  \@makeother\:%
+  \@makeother\-%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% Enforce normal catcodes for the definition of the |Id| scanning macros.
+% This makes sure that all scan patterns have the same catcodes during definition and execution.
+%    \begin{macrocode}
+\begingroup
+\svnprov@catcodes
+%    \end{macrocode}
+%
+% \begin{macro}{\svnprov@getid}
+% Saves first argument as filename and calls the scan macro with the second.
+% A fall-back string is provided to avoid \TeX\ parsing errors.
+%    \begin{macrocode}
+\gdef\svnprov@getid[#1]#2{%
+  \endgroup
+  \def\svnprov@filename{#1}%
+  \svnprov@scanid #2\relax $%
+    Id: unknown.xxx 0 0000-00-00 00:00:00Z user $\empty\svnprov@endmarker
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@scanid}
+% Parses the Id string and tests if it is correct (\#1=empty, \#8=\cs{relax}).
+% If correct the values are stored in macros and the next macro is called.
+% Otherwise a warning message is printed. In both cases any remaining text of 
+% the parsing procedure is gobbled before the next step.
+% \begin{macrocode}
+\gdef\svnprov@scanid#1$%
+  Id: #2 #3 #4-#5-#6 #7 $#8{%
+  \def\next{%
+    \begingroup
+    \PackageWarning{svn-prov}{Invalid SVN Id line found! File name might be
+    '#2' or '\expandafter\strip@prefix\meaning\@filef@und'. This occured}{}{}{}%
+    \endgroup
+    \svnprov@gobbleopt
+  }%
+  \ifx\relax#1\relax
+    \ifx\relax#8\empty
+      \def\svnprov@svnfilename{#2}%
+      \svnprov@splitfilename{#2}%
+      \def\svnprov@filerev@{#3}%
+      \def\svnprov@filedate@{#4/#5/#6}%
+      \def\svnprov@filetoday@{\svnprov@@today{#4}{#5}{#6}}%
+      \def\next{\begingroup\svnprov@catcodes\svnprov@buildstring}%
+    \fi
+  \fi
+  \expandafter\next\svnprov@gobblerest
+}% $
+%    \end{macrocode}
+% \end{macro}
+%
+% End of area with enforced catcodes.
+%    \begin{macrocode}
+\endgroup
+%    \end{macrocode}
+%
+% \begin{macro}{\svnprov@@today}
+% Prints \cs{today} with the given date.
+%    \begin{macrocode}
+\def\svnprov@@today#1#2#3{%
+  {\year#1\month#2\day#3\relax\today}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@splitfilename}
+% Expands the argument and initialises the file base macro before it calls the 
+% next macro with the expanded argument and a dot to protect for \TeX\ parsing 
+% errors. The \cs{relax} is used as end marker.
+%    \begin{macrocode}
+\def\svnprov@splitfilename#1{%
+  \edef\g@tempa{#1}%
+  \let\svnprov@filebase@\@gobble
+  \expandafter
+  \svnprov@splitfilename@\g@tempa.\relax
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@splitfilename@}
+% The second argument is tested if it is empty (end of file name reached). If 
+% not empty the first argument is concatenated to the file base macro and the 
+% macro calls itself on the second argument. This ensures correct handling of 
+% file name which contain multiple dots.
+% 
+% If the second argument was empty it is tested if the file base name is still 
+% in its initialised state which means that there is no file extension. Then the 
+% file base is defined to the first argument and the extension as empty.
+% Otherwise the file extension is defined to the first argument and the file 
+% base macro is unchanged because it is already correct.
+% \begin{macrocode}
+\def\svnprov@splitfilename@#1.#2\relax{%
+  \if&#2&
+    \ifx\svnprov@filebase@\@gobble
+      \gdef\svnprov@filebase@{#1}%
+      \gdef\svnprov@fileext@{}%
+    \else
+      \gdef\svnprov@fileext@{#1}%
+    \fi
+    \let\next\relax
+  \else
+    \xdef\svnprov@filebase@{\svnprov@filebase@.#1}%
+    \def\next{\svnprov@splitfilename@#2\relax}%
+  \fi
+  \next
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@gobblerest}
+% Simply gobbles everything up to the next endmarker.
+%    \begin{macrocode}
+\def\svnprov@gobblerest#1\svnprov@endmarker{}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@endmarker}
+% This is the end marker which should never be expanded. However it gets defined 
+% and set to an unique definition which will gobble itself if ever expanded.
+%    \begin{macrocode} 
+\def\svnprov@endmarker{\@gobble{svn-prov endmarker}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@gobbleopt}
+% Gobbles an optional argument if present.
+%    \begin{macrocode}
+\newcommand*\svnprov@gobbleopt[1][]{}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@defaultdesc}
+% Default description text to be used. Does not include the file date which is 
+% prepended later.
+%    \begin{macrocode}
+\def\svnprov@defaultdesc{%
+  (SVN Rev:\space\svnprov@filerev@)%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@buildstring}
+% First aliases the internal macro to user-friendly names and then builds the 
+% info string. Finally the stored original LaTeX macro is called with the 
+% filename and information.
+%    \begin{macrocode}
+\newcommand*\svnprov@buildstring[1][\svnprov@defaultdesc]{%
+  \@ifnextchar{[}%
+    {\svnprov@buildstring@{#1}}%
+    {\svnprov@buildstring@{#1}[\relax]}%
+}
+\def\svnprov@buildstring@#1[#2]{%
+  \endgroup
+  \begingroup
+    \let\rev\svnprov@filerev@
+    \let\filerev\svnprov@filerev@
+    \def\Rev{\rev\space}%
+    \let\revinfo\svnprov@defaultdesc
+    \let\filebase\svnprov@filebase@
+    \let\fileext\svnprov@fileext@
+    \ifx\fileversion\@undefined
+      \def\fileversion{v0.0}%
+    \fi
+    \edef\filename{\filebase.\fileext}%
+    \xdef\svnprov@filename{\svnprov@filename}%
+    \ifx\svnprov@filename\filename\else
+      \svnprov@splitfilename{\svnprov@filename}%
+    \fi
+    \let\filename\svnprov@filename
+    \ifx\relax#2\empty
+      \xdef\svnprov@fileinfo@{#1}%
+      \svnprov@getversion{#1}%
+      \global\let\svnprov@filedesc@\svnprov@filedesc@
+      \global\let\svnprov@fileinfo@\svnprov@fileinfo@
+    \else
+      \xdef\svnprov@fileversion@{#1}%
+      \xdef\svnprov@filedesc@{#2}%
+      \xdef\svnprov@fileinfo@{#1 #2}%
+    \fi
+  \endgroup
+  \svnprov@ltxprov{\svnprov@filemask}%
+    [\svnprov@filedate@
+     \ifx\svnprov@fileinfo@\empty\else
+      \space
+      \svnprov@fileinfo@
+     \fi
+   ]%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\GetFileInfoSVN}
+% \changes{v3.}{2010/04/01}{Added non-star version.}
+% The macro provides the file information of the given file, or (the star version) the last file which called one of the above \cs{Provides\ldots} macros.
+% For this the internal macros are simply copied to user-friendly names.
+%
+% This macro is inspired by the macro \cs{GetFileInfo}\marg{file name} from the 
+% \texttt{doc} package.
+%    \begin{macrocode}
+\def\GetFileInfoSVN#1{%
+  \ifx*#1\relax
+    \let\filebase\svnprov@filebase@
+    \let\fileext\svnprov@fileext@
+    \let\filename\svnprov@filename
+    \let\filedate\svnprov@filedate@
+    \let\filerev\svnprov@filerev@
+    \let\fileversion\svnprov@fileversion@
+    \let\fileinfo\svnprov@filedesc@
+    \let\filetoday\svnprov@filetoday@
+  \else
+%    \end{macrocode}
+% Given argument could be filename or short name.
+% If a short name exists for the argument it was a filename is is defined as such,
+% otherwise the filename is read from the |\|\meta{short name}|@long| macro.
+%    \begin{macrocode}
+    \expandafter\let\expandafter\@gtempa\csname#1@short\endcsname%
+    \ifx\@gtempa\relax
+      \def\@gtempa{#1}%
+      \expandafter\let\expandafter\filename\csname#1@long\endcsname
+    \else
+      \edef\filename{#1}%
+    \fi
+    \expandafter\let\expandafter\filebase\csname\@gtempa @base\endcsname
+    \expandafter\let\expandafter\fileext \csname\@gtempa @ext\endcsname
+    \expandafter\let\expandafter\filedate\csname\@gtempa @date\endcsname
+    \expandafter\let\expandafter\filerev \csname\@gtempa @rev\endcsname
+    \expandafter\let\expandafter\fileversion\csname\@gtempa @version\endcsname
+    \expandafter\let\expandafter\fileinfo\csname\@gtempa @info\endcsname
+    \expandafter\let\expandafter\filetoday\csname\@gtempa @today\endcsname
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\DefineFileInfoSVN}
+% Defines macros in the form |\|\meta{filename}|@|\meta{xxx}, where \meta{xxx} is |date|, |version|, |rev|(ision), |info|, (file name)|base| and |ext|(ension).
+% \changes{v3.}{2010/04/01}{Added file name `base' and 'ext'(ension).}
+%    \begin{macrocode}
+\newcommand*\DefineFileInfoSVN[1][\svnprov@filemask]{%
+  \expandafter
+  \edef\csname\svnprov@filemask @short\endcsname{#1}%
+  \expandafter
+  \edef\csname#1@long\endcsname{\svnprov@filemask}%
+  \expandafter
+  \let\csname#1@base\endcsname\svnprov@filebase@
+  \expandafter
+  \let\csname#1@ext\endcsname\svnprov@fileext@
+  \expandafter
+  \let\csname#1@date\endcsname\svnprov@filedate@
+  \expandafter
+  \let\csname#1@version\endcsname\svnprov@fileversion@
+  \expandafter
+  \let\csname#1@rev\endcsname\svnprov@filerev@
+  \expandafter
+  \let\csname#1@info\endcsname\svnprov@filedesc@
+  \expandafter
+  \let\csname#1@today\endcsname\svnprov@filetoday@
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\svnprov@getversion}
+% Checks if the argument (a file description) starts with `|v|'. If so
+% everything until the first space is taken as version number. Otherwise
+% the whole text is taken as description without version.
+% Special care is taken to avoid a parser error if there is no space included.
+% \changes{v3.}{2010/04/01}{Changed to look for leading `v' not just everything up to the first space.}
+%    \begin{macrocode}
+\def\svnprov@getversion#1{%
+  \edef\@tempa{#1\space}%
+  \expandafter\svnprov@@getversion\@tempa\svnprov@endmarker
+}
+\def\svnprov@@getversion{%
+  \@ifnextchar{v}%
+    {\svnprov@getversion@}%
+    {\svnprov@getversion@@}%
+}
+\def\svnprov@getversion@#1 #2\svnprov@endmarker{%
+  \gdef\svnprov@fileversion@{#1}%
+  \ifx&#2&%
+    \gdef\svnprov@filedesc@{}%
+  \else
+    \xdef\svnprov@filedesc@{\svnprov@zapspace#2\svnprov@endmarker}%
+  \fi
+}
+\def\svnprov@getversion@@#1 \svnprov@endmarker{%
+  \gdef\svnprov@fileversion@{}%
+  \gdef\svnprov@filedesc@{#1}%
+}
+\def\svnprov@zapspace#1 \svnprov@endmarker{#1}
+%    \end{macrocode}
+% \end{macro}
+%
+% Finally, call the macros for this package itself.
+%    \begin{macrocode}
+\ProvidesPackageSVN{$Id: svn-prov.sty 66 2011-09-10 18:26:00Z martin $}
+  [\svnprov@version\space Package Date/Version from SVN Keywords]
+\DefineFileInfoSVN[svnprov]
+%    \end{macrocode}
+%

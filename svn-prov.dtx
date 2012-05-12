@@ -91,6 +91,7 @@
 
 \let\manualnewpage\newpage
 \listfiles
+\OnlyDescription
 \begin{document}
   \DocInput{svn-prov.dtx}
   \PrintChanges
@@ -100,7 +101,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{423}
+% \CheckSum{420}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -251,23 +252,34 @@
 % and, since v3,\marginpar{\it\raggedright Updated in v3. 2010/04/24}
 % file name |base| and |ext|(ension) as well as |today|, which prints
 % the |date| in the format of \cs{today}.
+% If the filename contains non-letters like `|-|' and `|.|' then the resulting
+% macros can only be used with the help of \Macro\@nameuse{<macro name>}
+% or \Macro\csname~<macro name>\AlsoMacro\endcsname.
 %
 % \noindent
-% \textit{Example:} Applied to the |.dtx| file of this very package the 
-% following macros are defined:\par\medskip
+% \textit{Example:} For an example |.dtx| file with the following Id:\par\smallskip
+% {\small
+% \Macro\ProvidesFileSVN{'$Id: example.dtx 99 2011-09-10 18:26:00Z martin $'}\par
+% \hspace*{9.5em}\MacroArgs'[version description]'
+% \par\smallskip}%
+% \par\noindent the following macros are defined:\par\medskip
 % \begingroup
 % \makeatletter\centering
+% \let\cs\texttt
+% \tracingassigns=1
+% \ProvidesFileSVN{$Id: example.dtx 99 2011-09-10 18:26:00Z martin $}[version description]
+% \DefineFileInfoSVN\relax
 % \begin{tabular}{ll}
 %  \toprule
 %  Macro  & Definition \\
 %  \midrule
-%  \cs{svn-prov.dtx@version} & \@nameuse{svn-prov.dtx@version} \\
-%  \cs{svn-prov.dtx@rev}     & \@nameuse{svn-prov.dtx@rev}     \\
-%  \cs{svn-prov.dtx@date}    & \@nameuse{svn-prov.dtx@date}    \\
-%  \cs{svn-prov.dtx@info}    & \@nameuse{svn-prov.dtx@info}    \\
-%  \cs{svn-prov.dtx@base}    & \@nameuse{svn-prov.dtx@base}    \\
-%  \cs{svn-prov.dtx@ext}     & \@nameuse{svn-prov.dtx@ext}     \\
-%  \cs{svn-prov.dtx@today}   & \@nameuse{svn-prov.dtx@today}   \\
+%  \cs{example.dtx@version} & \@nameuse{example.dtx@version} \\
+%  \cs{example.dtx@rev}     & \@nameuse{example.dtx@rev}     \\
+%  \cs{example.dtx@date}    & \@nameuse{example.dtx@date}    \\
+%  \cs{example.dtx@info}    & \@nameuse{example.dtx@info}    \\
+%  \cs{example.dtx@base}    & \@nameuse{example.dtx@base}    \\
+%  \cs{example.dtx@ext}     & \@nameuse{example.dtx@ext}     \\
+%  \cs{example.dtx@today}   & \@nameuse{example.dtx@today}   \\
 %  \bottomrule
 % \end{tabular}
 % \par\bigskip
@@ -387,7 +399,7 @@
 %
 % \begin{example}
 %   \ProvidesPackageSVN
-%     {$Id$}
+%     {$Id: example.sty 99 2011-09-10 18:26:00Z martin $}
 %     [v1.\Rev Extra Text \revinfo]
 %   \GetFileInfoSVN*
 %   % ...

@@ -1,5 +1,13 @@
 %    \begin{macrocode}
+%<!COPYRIGHT>
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
+\ProvidesPackage{svn-prov}[%
+%<!DATE>
+%<!VERSION>
+%<*DRIVER>
+    2099/01/01 develop
+%</DRIVER>
+    Package Date/Version from SVN Keywords]
 %    \end{macrocode}
 %
 % \begin{macro}{\ProvidesClassSVN}
@@ -352,11 +360,4 @@
 \def\svnprov@zapspace#1 \svnprov@endmarker{#1}
 %    \end{macrocode}
 % \end{macro}
-%
-% Finally, call the macros for this package itself.
-%    \begin{macrocode}
-\ProvidesPackageSVN{$Id: svn-prov.sty 66 2011-09-10 18:26:00Z martin $}
-  [\svnprov@version\space Package Date/Version from SVN Keywords]
-\DefineFileInfoSVN[svnprov]
-%    \end{macrocode}
 %

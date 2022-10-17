@@ -1,6 +1,6 @@
 Package svn-prov
 ~~~~~~~~~~~~~~~~
-Copyright (C) 2009-2016 Martin Scharrer <martin@scharrer-online.de>
+Copyright (c) 2009-2022 Martin Scharrer <martin.scharrer@web.de>
 See the svn-prov.dtx or svn-prov.ins file for the licence information (LPPL).
 
 
